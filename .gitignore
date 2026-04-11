@@ -3,3 +3,5 @@ dist
 .claude
 *.local
 index.html.v1.bak
+.env
+.env.local

@@ -41,6 +41,18 @@ const projectToForm = (p: Project): ProjectFormData => ({
   youtubeId: p.youtubeId ?? '',
 })
 
+// Accepte un lien complet ou un ID brut
+// https://youtu.be/dQw4w9WgXcQ → dQw4w9WgXcQ
+// https://youtube.com/watch?v=dQw4w9WgXcQ → dQw4w9WgXcQ
+// dQw4w9WgXcQ → dQw4w9WgXcQ
+function extractYouTubeId(input: string): string {
+  const s = input.trim()
+  const match = s.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)
+  if (match) return match[1]
+  if (/^[a-zA-Z0-9_-]{11}$/.test(s)) return s
+  return s
+}
+
 const formToProject = (f: ProjectFormData, index: number): Project => {
   const slug = (f.id.trim() || f.name).toLowerCase().trim()
     .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
@@ -51,7 +63,8 @@ const formToProject = (f: ProjectFormData, index: number): Project => {
     tags: f.tagsStr.split(',').map(t => t.trim()).filter(Boolean),
     highlights: f.highlightsStr.split('\n').map(s => s.trim()).filter(Boolean),
   }
-  if (f.youtubeId?.trim()) obj.youtubeId = f.youtubeId.trim()
+  const ytId = extractYouTubeId(f.youtubeId)
+  if (ytId) obj.youtubeId = ytId
   if (f.links?.length) obj.links = f.links.filter(l => l.label || l.url)
   return obj
 }
@@ -368,7 +381,7 @@ export function AdminPage() {
                           {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
                         </select>
                       </Field>
-                      <Field label="YouTube ID"><input value={projForm.youtubeId} onChange={e => setProjForm(f => ({...f, youtubeId: e.target.value}))} className="admin-input" placeholder="dQw4w9WgXcQ" /></Field>
+                      <Field label="Vidéo YouTube"><input value={projForm.youtubeId} onChange={e => setProjForm(f => ({...f, youtubeId: e.target.value}))} className="admin-input" placeholder="https://youtu.be/... ou https://youtube.com/watch?v=..." /></Field>
                       <Field label="Description courte *" className="md:col-span-2"><input value={projForm.shortDesc} onChange={e => setProjForm(f => ({...f, shortDesc: e.target.value}))} className="admin-input" placeholder="Une phrase résumant le projet" /></Field>
                       <Field label="Description complète *" className="md:col-span-2"><textarea value={projForm.fullDesc} onChange={e => setProjForm(f => ({...f, fullDesc: e.target.value}))} rows={4} className="admin-input resize-y" /></Field>
                       <Field label="Technologies (virgules)" className="md:col-span-2"><input value={projForm.tagsStr} onChange={e => setProjForm(f => ({...f, tagsStr: e.target.value}))} className="admin-input" placeholder="Python, FastAPI, RAG" /></Field>

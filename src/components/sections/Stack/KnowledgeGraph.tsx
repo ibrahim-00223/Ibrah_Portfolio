@@ -3,8 +3,6 @@ import ForceGraph2D from 'react-force-graph-2d'
 import { groupColors, groupLabels } from '../../../data/stack'
 import { getStackNodes, getStackLinks } from '../../../data/stackStore'
 
-const stackNodes = getStackNodes()
-const stackLinks = getStackLinks()
 
 type NodeObject = {
   id: string
@@ -20,6 +18,8 @@ interface KnowledgeGraphProps {
 }
 
 export function KnowledgeGraph({ activeFilter }: KnowledgeGraphProps) {
+  const stackNodes = getStackNodes()
+  const stackLinks = getStackLinks()
   const graphRef = useRef<any>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [hoveredNode, setHoveredNode] = useState<NodeObject | null>(null)

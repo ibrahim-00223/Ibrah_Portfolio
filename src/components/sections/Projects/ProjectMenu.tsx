@@ -1,8 +1,6 @@
 import { motion } from 'framer-motion'
-import { getProjects } from '../../../data/projectsStore'
-
-const projects = getProjects()
 import clsx from 'clsx'
+import { getProjects } from '../../../data/projectsStore'
 
 const statusColors = {
   'Complété': 'text-emerald-400',
@@ -16,6 +14,8 @@ interface ProjectMenuProps {
 }
 
 export function ProjectMenu({ selectedId, onSelect }: ProjectMenuProps) {
+  const projects = getProjects()
+
   return (
     <div className="flex flex-col gap-3">
       {projects.map((project, i) => {
@@ -35,7 +35,6 @@ export function ProjectMenu({ selectedId, onSelect }: ProjectMenuProps) {
               )}
             >
               <div className="flex items-start justify-between gap-4">
-                {/* Left: number + name + desc */}
                 <div className="flex items-start gap-4 min-w-0">
                   <span className="text-brand-pink font-mono text-sm font-medium shrink-0 mt-0.5">
                     {project.number}
@@ -53,7 +52,6 @@ export function ProjectMenu({ selectedId, onSelect }: ProjectMenuProps) {
                   </div>
                 </div>
 
-                {/* Right: status + arrow */}
                 <div className="flex items-center gap-3 shrink-0">
                   <span className={clsx('text-xs font-mono hidden md:block', statusColors[project.status])}>
                     {project.status}

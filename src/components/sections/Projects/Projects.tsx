@@ -4,9 +4,8 @@ import { ProjectMenu } from './ProjectMenu'
 import { ProjectCard } from './ProjectCard'
 import { getProjects } from '../../../data/projectsStore'
 
-const projects = getProjects()
-
 export function Projects() {
+  const projects = getProjects()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-60px' })

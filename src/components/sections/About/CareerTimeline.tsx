@@ -1,9 +1,7 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { getTimeline } from '../../../data/timelineStore'
-
-const timelinePhases = getTimeline()
 import clsx from 'clsx'
+import { getTimeline } from '../../../data/timelineStore'
 
 const colorMap = {
   amber: { dot: 'bg-[#ffb000]', text: 'text-[#ffb000]', border: 'border-[#ffb000]' },
@@ -12,6 +10,7 @@ const colorMap = {
 }
 
 export function CareerTimeline() {
+  const timelinePhases = getTimeline()
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-60px' })
 
@@ -29,7 +28,6 @@ export function CareerTimeline() {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: i * 0.15 }}
             >
-              {/* Connector line */}
               {i < timelinePhases.length - 1 && (
                 <motion.div
                   className="absolute top-5 left-full w-full h-px bg-border-strong origin-left z-0"
@@ -38,28 +36,18 @@ export function CareerTimeline() {
                   transition={{ duration: 0.6, delay: i * 0.15 + 0.3 }}
                 />
               )}
-
               <div className="card p-6 relative z-10 h-full flex flex-col gap-4">
-                {/* Step + period */}
                 <div className="flex items-center justify-between">
                   <div className={clsx('w-3 h-3 rounded-full flex-shrink-0', c.dot)} />
                   <span className="text-xs font-mono text-text-tertiary">{phase.period}</span>
                 </div>
-
-                {/* Title */}
                 <div>
                   <div className="text-sm font-semibold text-white leading-snug">{phase.title}</div>
                   {phase.company && (
                     <div className={clsx('text-xs font-mono mt-0.5', c.text)}>@ {phase.company}</div>
                   )}
                 </div>
-
-                {/* Description */}
-                <p className="text-sm text-text-secondary leading-relaxed flex-1">
-                  {phase.description}
-                </p>
-
-                {/* Tags */}
+                <p className="text-sm text-text-secondary leading-relaxed flex-1">{phase.description}</p>
                 <div className="flex flex-wrap gap-1.5">
                   {phase.tags.map((tag) => (
                     <span key={tag} className="tag">{tag}</span>
@@ -84,13 +72,10 @@ export function CareerTimeline() {
               animate={isInView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.5, delay: i * 0.15 }}
             >
-              {/* Timeline column */}
               <div className="flex flex-col items-center pt-1.5">
                 <div className={clsx('w-3 h-3 rounded-full flex-shrink-0', c.dot)} />
                 {!isLast && <div className="w-px flex-1 bg-border my-1" />}
               </div>
-
-              {/* Content */}
               <div className={clsx('pb-6 flex-1', isLast && 'pb-0')}>
                 <span className="text-xs font-mono text-text-tertiary">{phase.period}</span>
                 <div className="text-sm font-semibold text-white mt-1">{phase.title}</div>

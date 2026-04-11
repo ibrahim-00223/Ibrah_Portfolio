@@ -4,8 +4,6 @@ import clsx from 'clsx'
 import { getProjects } from '../../data/projectsStore'
 import { VideoBlock } from '../ui/VideoBlock'
 
-const projects = getProjects()
-
 const statusConfig = {
   'Complété': { color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20' },
   'En cours': { color: 'text-brand-pink',  bg: 'bg-brand-pink/10',  border: 'border-brand-pink/20'  },
@@ -23,6 +21,7 @@ const item = {
 }
 
 export function ProjectDetailPage() {
+  const projects = getProjects()
   const { id } = useParams<{ id: string }>()
   const project = projects.find((p) => p.id === id)
 

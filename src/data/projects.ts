@@ -8,6 +8,10 @@ export type Project = {
   tags: string[]
   highlights: string[]
   links?: { label: string; url: string }[]
+  // YouTube video ID — la partie après ?v= ou youtu.be/
+  // Ex : https://www.youtube.com/watch?v=dQw4w9WgXcQ → "dQw4w9WgXcQ"
+  // Laisser undefined jusqu'à ce que le screen record soit prêt.
+  youtubeId?: string
 }
 
 export const projects: Project[] = [

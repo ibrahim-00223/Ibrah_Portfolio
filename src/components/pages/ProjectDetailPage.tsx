@@ -1,10 +1,10 @@
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import clsx from 'clsx'
 import { getProjects } from '../../data/projectsStore'
+import { VideoBlock } from '../ui/VideoBlock'
 
 const projects = getProjects()
-import { VideoBlock } from '../ui/VideoBlock'
-import clsx from 'clsx'
 
 const statusConfig = {
   'Complété': { color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20' },
@@ -69,7 +69,7 @@ export function ProjectDetailPage() {
             <p className="text-text-secondary text-lg leading-relaxed">{project.shortDesc}</p>
           </motion.div>
 
-          {/* Vidéo de démo — hero visuel */}
+          {/* Vidéo de démo */}
           <motion.div variants={item}>
             <VideoBlock youtubeId={project.youtubeId} />
           </motion.div>
@@ -107,7 +107,7 @@ export function ProjectDetailPage() {
 
           <motion.div variants={item} className="divider" />
 
-          {/* Other projects */}
+          {/* Autres projets */}
           <motion.div variants={item} className="space-y-3">
             <h2 className="text-sm font-semibold text-text-tertiary tracking-widest uppercase">Autres projets</h2>
             <div className="flex flex-wrap gap-3">

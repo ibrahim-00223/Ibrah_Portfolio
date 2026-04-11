@@ -1,6 +1,8 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { timelinePhases } from '../../../data/timeline'
+import { getTimeline } from '../../../data/timelineStore'
+
+const timelinePhases = getTimeline()
 import clsx from 'clsx'
 
 const colorMap = {

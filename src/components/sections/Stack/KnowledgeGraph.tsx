@@ -1,6 +1,10 @@
 import { useRef, useCallback, useState, useEffect, useMemo } from 'react'
 import ForceGraph2D from 'react-force-graph-2d'
-import { stackNodes, stackLinks, groupColors, groupLabels } from '../../../data/stack'
+import { groupColors, groupLabels } from '../../../data/stack'
+import { getStackNodes, getStackLinks } from '../../../data/stackStore'
+
+const stackNodes = getStackNodes()
+const stackLinks = getStackLinks()
 
 type NodeObject = {
   id: string

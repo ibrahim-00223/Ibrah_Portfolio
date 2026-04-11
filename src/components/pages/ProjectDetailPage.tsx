@@ -71,7 +71,7 @@ export function ProjectDetailPage() {
 
           {/* Vidéo de démo */}
           <motion.div variants={item}>
-            <VideoBlock youtubeId={project.youtubeId} />
+            <VideoBlock src={project.youtubeId} />
           </motion.div>
 
           <motion.div variants={item} className="divider" />

@@ -12,12 +12,19 @@ const SESSION_KEY = 'portfolio_admin_auth'
 const STATUS_OPTIONS: Project['status'][] = ['En cours', 'Complété', 'Concept']
 
 // ── Types formulaire ─────────────────────────────────────────────────────────
-type FormData = Omit<Project, 'number' | 'tags' | 'highlights'> & {
+type ProjectFormData = {
+  id: string
+  name: string
+  shortDesc: string
+  fullDesc: string
+  status: Project['status']
   tagsStr: string
   highlightsStr: string
+  links: { label: string; url: string }[]
+  youtubeId: string
 }
 
-function emptyForm(): FormData {
+function emptyForm(): ProjectFormData {
   return {
     id: '', name: '', shortDesc: '', fullDesc: '',
     status: 'En cours',
@@ -26,7 +33,7 @@ function emptyForm(): FormData {
   }
 }
 
-function projectToForm(p: Project): FormData {
+function projectToForm(p: Project): ProjectFormData {
   return {
     id: p.id, name: p.name, shortDesc: p.shortDesc, fullDesc: p.fullDesc,
     status: p.status,
@@ -37,7 +44,7 @@ function projectToForm(p: Project): FormData {
   }
 }
 
-function formToProject(f: FormData, index: number): Project {
+function formToProject(f: ProjectFormData, index: number): Project {
   const slug = (f.id.trim() || f.name)
     .toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
   const obj: Project = {
@@ -77,7 +84,7 @@ export function AdminPage() {
   const [projects, setProjects] = useState<Project[]>(() => getProjects())
   const [customMode, setCustomMode] = useState(() => isUsingCustomProjects())
   const [editing, setEditing] = useState<string | null>(null)   // id projet ou 'new'
-  const [form, setForm] = useState<FormData>(emptyForm())
+  const [form, setForm] = useState<ProjectFormData>(emptyForm())
   const [saveMsg, setSaveMsg] = useState('')
 
   const fileInputRef = useRef<HTMLInputElement>(null)

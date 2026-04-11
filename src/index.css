@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root { color-scheme: dark; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    @apply bg-bg text-text-primary font-sans antialiased overflow-x-hidden;
+  }
+
+  ::selection {
+    background: rgba(230, 0, 76, 0.25);
+    color: #fff;
+  }
+
+  ::-webkit-scrollbar       { width: 4px; }
+  ::-webkit-scrollbar-track { background: #080808; }
+  ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
+}
+
+@layer components {
+  /* Section wrapper */
+  .section-inner {
+    @apply max-w-5xl mx-auto px-4 md:px-8;
+  }
+
+  /* Section label above title */
+  .section-eyebrow {
+    @apply text-xs font-mono tracking-widest uppercase text-text-tertiary mb-3;
+  }
+
+  /* Card base */
+  .card {
+    @apply bg-bg-surface border border-border rounded-lg shadow-card transition-all duration-200;
+  }
+
+  .card:hover {
+    @apply shadow-card-hover border-border-strong;
+  }
+
+  /* Pink accent line */
+  .accent-line {
+    @apply w-8 h-0.5 bg-brand-pink;
+  }
+
+  /* Tag / pill */
+  .tag {
+    @apply inline-flex items-center text-xs font-mono px-2.5 py-1
+           bg-bg-raised border border-border text-text-secondary rounded;
+  }
+
+  /* Pink tag */
+  .tag-pink {
+    @apply tag border-border-accent text-brand-pink bg-[rgba(230,0,76,0.06)];
+  }
+
+  /* Button primary */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium
+           bg-brand-pink text-white rounded-md
+           hover:bg-[#cc003d] active:scale-95
+           transition-all duration-150;
+  }
+
+  /* Button ghost */
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium
+           border border-border text-text-secondary rounded-md
+           hover:border-border-strong hover:text-text-primary
+           transition-all duration-150;
+  }
+
+  /* Divider */
+  .divider {
+    @apply border-t border-border;
+  }
+}

@@ -1,0 +1,5 @@
+node_modules
+dist
+.claude
+*.local
+index.html.v1.bak

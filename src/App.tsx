@@ -7,6 +7,7 @@ import { Projects } from './components/sections/Projects/Projects'
 import { Stack } from './components/sections/Stack/Stack'
 import { Contact } from './components/sections/Contact/Contact'
 import { ProjectDetailPage } from './components/pages/ProjectDetailPage'
+import { AdminPage } from './components/pages/AdminPage'
 
 function MainLayout() {
   return (
@@ -35,8 +36,9 @@ function ProjectLayout() {
 }
 
 const router = createHashRouter([
-  { path: '/',             element: <MainLayout />   },
+  { path: '/',             element: <MainLayout />    },
   { path: '/projets/:id',  element: <ProjectLayout /> },
+  { path: '/admin',        element: <AdminPage />     },
 ])
 
 export function App() {

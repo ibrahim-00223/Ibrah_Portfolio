@@ -2,7 +2,9 @@ import { useState, useRef } from 'react'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
 import { ProjectMenu } from './ProjectMenu'
 import { ProjectCard } from './ProjectCard'
-import { projects } from '../../../data/projects'
+import { getProjects } from '../../../data/projectsStore'
+
+const projects = getProjects()
 
 export function Projects() {
   const [selectedId, setSelectedId] = useState<string | null>(null)

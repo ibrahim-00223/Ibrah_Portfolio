@@ -1,6 +1,9 @@
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { projects } from '../../data/projects'
+import { getProjects } from '../../data/projectsStore'
+
+const projects = getProjects()
+import { VideoBlock } from '../ui/VideoBlock'
 import clsx from 'clsx'
 
 const statusConfig = {
@@ -64,6 +67,11 @@ export function ProjectDetailPage() {
             </div>
             <h1 className="font-display text-display-lg text-white">{project.name}</h1>
             <p className="text-text-secondary text-lg leading-relaxed">{project.shortDesc}</p>
+          </motion.div>
+
+          {/* Vidéo de démo — hero visuel */}
+          <motion.div variants={item}>
+            <VideoBlock youtubeId={project.youtubeId} />
           </motion.div>
 
           <motion.div variants={item} className="divider" />

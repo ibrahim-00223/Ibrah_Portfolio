@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion'
-import { projects } from '../../../data/projects'
+import { getProjects } from '../../../data/projectsStore'
+
+const projects = getProjects()
 import clsx from 'clsx'
 
 const statusColors = {

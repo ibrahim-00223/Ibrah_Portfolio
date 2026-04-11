@@ -77,4 +77,16 @@
   .divider {
     @apply border-t border-border;
   }
+
+  /* Admin form inputs */
+  .admin-input {
+    @apply w-full bg-bg-raised border border-border rounded-lg px-3.5 py-2.5
+           text-white placeholder:text-text-tertiary text-sm
+           focus:outline-none focus:border-brand-pink/50
+           transition-colors duration-150;
+  }
+
+  .admin-input:is(select) {
+    @apply cursor-pointer;
+  }
 }

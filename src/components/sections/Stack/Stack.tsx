@@ -1,22 +1,8 @@
-import { useRef, lazy, Suspense, useState } from 'react'
+import { useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { groupLabels, groupColors } from '../../../data/stack'
 import clsx from 'clsx'
-
-const KnowledgeGraph = lazy(() =>
-  import('./KnowledgeGraph').then((m) => ({ default: m.KnowledgeGraph }))
-)
-
-function GraphLoader() {
-  return (
-    <div className="border border-border rounded-lg bg-bg flex items-center justify-center h-64">
-      <div className="flex items-center gap-2 text-sm text-text-secondary">
-        <div className="w-4 h-4 border-2 border-brand-pink border-t-transparent rounded-full animate-spin" />
-        Chargement du graphe...
-      </div>
-    </div>
-  )
-}
+import { StackTree } from './StackTree'
 
 export function Stack() {
   const ref = useRef<HTMLDivElement>(null)
@@ -38,8 +24,8 @@ export function Stack() {
             <div className="accent-line mb-3" />
           </div>
           <p className="text-text-secondary text-base leading-relaxed max-w-2xl mb-8">
-            Cartographie interactive de mes outils et technologies.
-            Survolez un nœud pour voir ses connexions. Filtrez par catégorie.
+            Vue hiérarchique de mes outils et technologies.
+            Filtrez par catégorie, survolez un élément pour le mettre en valeur.
           </p>
 
           {/* Filters */}
@@ -80,10 +66,8 @@ export function Stack() {
             })}
           </div>
 
-          {/* Graph */}
-          <Suspense fallback={<GraphLoader />}>
-            <KnowledgeGraph activeFilter={activeFilter} />
-          </Suspense>
+          {/* Tree */}
+          <StackTree activeFilter={activeFilter} />
         </motion.div>
       </div>
     </section>

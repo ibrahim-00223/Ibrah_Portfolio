@@ -1,7 +1,6 @@
-import { stackNodes as staticNodes, stackLinks as staticLinks, type StackNode, type StackLink } from './stack'
+import { stackNodes as staticNodes, type StackNode, type StackLink } from './stack'
 
 const NODES_KEY = 'portfolio_stack_nodes'
-const LINKS_KEY = 'portfolio_stack_links'
 
 export function getStackNodes(): StackNode[] {
   try {
@@ -14,25 +13,19 @@ export function getStackNodes(): StackNode[] {
   return staticNodes
 }
 
+// Links are always derived from the parent field — never stored separately
 export function getStackLinks(): StackLink[] {
-  try {
-    const stored = localStorage.getItem(LINKS_KEY)
-    if (stored) {
-      const parsed = JSON.parse(stored)
-      if (Array.isArray(parsed)) return parsed as StackLink[]
-    }
-  } catch { /* silent fallback */ }
-  return staticLinks
+  return getStackNodes()
+    .filter(n => n.parent)
+    .map(n => ({ source: n.parent!, target: n.id }))
 }
 
-export function saveStack(nodes: StackNode[], links: StackLink[]): void {
+export function saveStack(nodes: StackNode[]): void {
   localStorage.setItem(NODES_KEY, JSON.stringify(nodes))
-  localStorage.setItem(LINKS_KEY, JSON.stringify(links))
 }
 
 export function resetStack(): void {
   localStorage.removeItem(NODES_KEY)
-  localStorage.removeItem(LINKS_KEY)
 }
 
 export function isUsingCustomStack(): boolean {

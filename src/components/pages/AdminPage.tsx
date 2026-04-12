@@ -5,11 +5,11 @@ import clsx from 'clsx'
 
 import { getProjects, saveProjects, resetProjects, isUsingCustomProjects } from '../../data/projectsStore'
 import { getTimeline, saveTimeline, resetTimeline, isUsingCustomTimeline } from '../../data/timelineStore'
-import { getStackNodes, getStackLinks, saveStack, resetStack, isUsingCustomStack } from '../../data/stackStore'
+import { getStackNodes, saveStack, resetStack, isUsingCustomStack } from '../../data/stackStore'
 
 import type { Project } from '../../data/projects'
 import type { TimelinePhase } from '../../data/timeline'
-import type { StackNode, StackLink } from '../../data/stack'
+import type { StackNode } from '../../data/stack'
 import { groupLabels } from '../../data/stack'
 
 // ── Mot de passe — modifier ici ──────────────────────────────────────────────
@@ -104,16 +104,13 @@ const formToExp = (f: ExpFormData): TimelinePhase => {
 // ═══════════════════════════════════════════════════════════════════════════════
 const GROUP_OPTIONS = Object.keys(groupLabels) as StackNode['group'][]
 
-type StackFormData = StackNode & { linksTo: string }
+type StackFormData = StackNode
 
 const emptyStackForm = (): StackFormData => ({
-  id: '', label: '', group: 'lang', size: 9, linksTo: '',
+  id: '', label: '', group: 'lang', size: 9,
 })
 
-const nodeToForm = (n: StackNode, links: StackLink[]): StackFormData => ({
-  ...n,
-  linksTo: links.filter(l => l.source === n.id).map(l => l.target).join(', '),
-})
+const nodeToForm = (n: StackNode): StackFormData => ({ ...n })
 
 // ── Les composants UI partagés (Field, StatusBanner, etc.) sont déclarés après AdminPage ──
 export function AdminPage() {
@@ -139,7 +136,6 @@ export function AdminPage() {
 
   // ── STACK state ────────────────────────────────────────────────────────────
   const [nodes, setNodes]             = useState<StackNode[]>(() => getStackNodes())
-  const [links, setLinks]             = useState<StackLink[]>(() => getStackLinks())
   const [customStack, setCustomStack] = useState(() => isUsingCustomStack())
   const [editingStack, setEditingStack] = useState<string | null>(null)
   const [stackForm, setStackForm]     = useState<StackFormData>(emptyStackForm())
@@ -223,26 +219,33 @@ export function AdminPage() {
   // ════════════════════════════════════════════════════════════════════════════
   // STACK handlers
   // ════════════════════════════════════════════════════════════════════════════
-  const persistStack = (updatedNodes: StackNode[], updatedLinks: StackLink[]) => {
-    saveStack(updatedNodes, updatedLinks)
-    setNodes(getStackNodes()); setLinks(getStackLinks()); setCustomStack(true); flash()
+  const persistStack = (updatedNodes: StackNode[]) => {
+    saveStack(updatedNodes)
+    setNodes(getStackNodes()); setCustomStack(true); flash()
   }
   const handleStackSave = () => {
     const slug = (stackForm.id.trim() || stackForm.label).toLowerCase().trim()
       .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
-    const node: StackNode = { id: slug, label: stackForm.label.trim(), group: stackForm.group, size: stackForm.size }
+    const node: StackNode = {
+      id: slug,
+      label: stackForm.label.trim(),
+      group: stackForm.group,
+      size: stackForm.size,
+      ...(stackForm.parent ? { parent: stackForm.parent } : {}),
+    }
     const isNew = editingStack === 'new'
-    const updatedNodes = isNew ? [...nodes, node] : nodes.map(n => n.id === editingStack ? node : n)
-    // Rebuild all links: keep links from other nodes, replace links from this node
-    const otherLinks = links.filter(l => l.source !== (isNew ? slug : editingStack))
-    const newLinks = stackForm.linksTo.split(',').map(t => t.trim()).filter(Boolean)
-      .map(target => ({ source: slug, target }))
-    persistStack(updatedNodes, [...otherLinks, ...newLinks])
+    const updatedNodes = isNew
+      ? [...nodes, node]
+      : nodes.map(n => n.id === editingStack ? node : n)
+    persistStack(updatedNodes)
     setEditingStack(null)
   }
   const handleStackDelete = (id: string) => {
     if (!confirm(`Supprimer "${nodes.find(n => n.id === id)?.label}" ?`)) return
-    persistStack(nodes.filter(n => n.id !== id), links.filter(l => l.source !== id && l.target !== id))
+    // Also clear parent references pointing to this node
+    persistStack(
+      nodes.filter(n => n.id !== id).map(n => n.parent === id ? { ...n, parent: undefined } : n)
+    )
   }
 
   // ════════════════════════════════════════════════════════════════════════════
@@ -497,7 +500,7 @@ export function AdminPage() {
         {tab === 'stack' && (
           <div className="space-y-6">
             <StatusBanner custom={customStack} count={nodes.length} label="technologie"
-              onReset={() => { resetStack(); setNodes(getStackNodes()); setLinks(getStackLinks()); setCustomStack(false); flash('Réinitialisé ✓') }} />
+              onReset={() => { resetStack(); setNodes(getStackNodes()); setCustomStack(false); flash('Réinitialisé ✓') }} />
 
             <div className="flex flex-wrap gap-3">
               <button onClick={() => { setStackForm(emptyStackForm()); setEditingStack('new') }} className="btn-primary text-sm">
@@ -527,9 +530,23 @@ export function AdminPage() {
                         <input type="range" min={6} max={14} value={stackForm.size} onChange={e => setStackForm(f=>({...f,size:+e.target.value}))} className="w-full accent-brand-pink" />
                       </Field>
                       <Field label="Slug (ID)"><input value={stackForm.id} onChange={e => setStackForm(f=>({...f,id:e.target.value}))} className="admin-input" placeholder="langchain (auto depuis le nom)" /></Field>
-                      <Field label="Connecté à (IDs, virgules)" className="md:col-span-2">
-                        <input value={stackForm.linksTo} onChange={e => setStackForm(f=>({...f,linksTo:e.target.value}))} className="admin-input" placeholder="python, rag, vectordb" />
-                        <p className="text-text-tertiary text-xs mt-1">IDs des nœuds reliés dans le graphe. Ex : python, rag</p>
+                      <Field label="Nœud parent (optionnel)">
+                        <select
+                          value={stackForm.parent ?? ''}
+                          onChange={e => setStackForm(f => ({ ...f, parent: e.target.value || undefined }))}
+                          className="admin-input"
+                        >
+                          <option value="">— Aucun parent (nœud racine) —</option>
+                          {nodes
+                            .filter(n => n.id !== (editingStack === 'new' ? '' : editingStack))
+                            .map(n => (
+                              <option key={n.id} value={n.id}>
+                                [{groupLabels[n.group]}] {n.label}
+                              </option>
+                            ))
+                          }
+                        </select>
+                        <p className="text-text-tertiary text-xs mt-1">Choisir un parent crée automatiquement le lien dans l'arbre.</p>
                       </Field>
                     </div>
                     <FormActions onSave={handleStackSave} onCancel={() => setEditingStack(null)} disabled={!stackForm.label.trim()} />
@@ -550,10 +567,10 @@ export function AdminPage() {
                       <div className="flex-1 min-w-0">
                         <div className="font-medium text-white text-sm">{n.label}</div>
                         <div className="text-text-tertiary text-xs mt-0.5 font-mono">
-                          id: {n.id} · size: {n.size} · liens: {links.filter(l=>l.source===n.id).length}
+                          id: {n.id} · size: {n.size}{n.parent ? ` · parent: ${n.parent}` : ''}
                         </div>
                       </div>
-                      <RowActions onEdit={() => { setStackForm(nodeToForm(n, links)); setEditingStack(n.id) }} onDelete={() => handleStackDelete(n.id)} />
+                      <RowActions onEdit={() => { setStackForm(nodeToForm(n)); setEditingStack(n.id) }} onDelete={() => handleStackDelete(n.id)} />
                     </motion.div>
                   ))}
                 </div>

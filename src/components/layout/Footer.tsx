@@ -7,7 +7,7 @@ export function Footer() {
         <Link to="/admin" className="font-display font-bold text-white hover:text-brand-pink transition-colors">IC.</Link>
         <span>© 2026 Ibrahim CISSE — Conçu &amp; codé à la main</span>
         <div className="flex items-center gap-4">
-          <a href="https://www.linkedin.com/in/ibrahim-cisse-b6a8231b3/" target="_blank" rel="noopener noreferrer"
+          <a href="https://www.linkedin.com/in/ibrahim-ciss%C3%A9-6981b8240/" target="_blank" rel="noopener noreferrer"
              className="hover:text-white transition-colors">LinkedIn</a>
           <a href="https://github.com/" target="_blank" rel="noopener noreferrer"
              className="hover:text-white transition-colors">GitHub</a>

@@ -5,14 +5,14 @@ import clsx from 'clsx'
 const contactLinks = [
   {
     label: 'Email',
-    value: 'ibrahim.cisse@proton.me',
-    href:  'mailto:ibrahim.cisse@proton.me',
+    value: 'ibrahim.cisse.pro@gmail.com',
+    href:  'mailto:ibrahim.cisse.pro@gmail.com',
     icon:  '✉',
   },
   {
     label: 'LinkedIn',
-    value: 'linkedin.com/in/ibrahim-cisse',
-    href:  'https://www.linkedin.com/in/ibrahim-cisse-b6a8231b3/',
+    value: 'linkedin.com/in/ibrahim-cissé',
+    href:  'https://www.linkedin.com/in/ibrahim-ciss%C3%A9-6981b8240/',
     icon:  'in',
   },
   {

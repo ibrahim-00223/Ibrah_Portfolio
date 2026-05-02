@@ -92,7 +92,7 @@ export function Hero() {
               variants={item}
               className="text-lg font-light text-text-secondary mb-6 leading-snug"
             >
-              Builder · RevOps Engineer · AI Builder
+              GTM Engineer · AI Builder · Content Creator
             </motion.p>
 
             {/* Description */}

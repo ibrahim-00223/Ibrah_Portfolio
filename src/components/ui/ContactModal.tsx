@@ -91,7 +91,7 @@ export function ContactModal({ isOpen, onClose }: Props) {
               </div>
               <div className="text-center">
                 <p className="font-display font-bold text-white text-lg leading-tight">Ibrahim CISSE</p>
-                <p className="text-text-secondary text-sm mt-0.5">Builder · RevOps · AI</p>
+                <p className="text-text-secondary text-sm mt-0.5">GTM Engineer · AI Builder · Content Creator</p>
               </div>
             </div>
 

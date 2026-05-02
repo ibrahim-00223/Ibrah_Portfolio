@@ -18,11 +18,8 @@ const links = [
     sub: 'Notion Calendar',
     href: 'https://calendar.notion.so/meet/ibrahimcisse1/044on4pg6',
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 shrink-0">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-        <line x1="16" y1="2" x2="16" y2="6" />
-        <line x1="8" y1="2" x2="8" y2="6" />
-        <line x1="3" y1="10" x2="21" y2="10" />
+      <svg viewBox="0 0 100 100" fill="currentColor" className="w-5 h-5 shrink-0">
+        <path d="M6.6 7.8C10.4 10.9 11.8 10.6 19 10.1l67.2-4c1.4 0 .3-1.4-.3-1.7L74 .7C72 -.1 68.5-.1 65.2.2L.7 4.8C-1 5 -1.3 7 .7 7.8L6.6 7.8zM9.3 32.1V99c0 3.8 1.9 5.2 6.2 4.9L95.9 99.5c4.3-.3 4.8-2.9 4.8-6.1V29.2c0-3.2-1.3-4.9-4.1-4.6l-83.1 4.9c-3.1.3-4.2 1.7-4.2 4.6zM89.5 37.5c.5 2.2 0 4.4-2.2 4.7l-3.6.7v53c-3.1 1.7-6 2.6-8.4 2.6-3.9 0-4.9-1.2-7.8-4.9L44.2 64v29l8.2 1.8s0 4.4-6.1 4.4L29.7 100.4c-.5-1.1 0-3.8 1.7-4.3l4.4-1.2V45.2L29.7 44.8c-.5-2.2.6-5.4 3.8-5.7l17.3-1.1 24.2 37V40.1l-6.9-.8c-.5-2.7 1.4-4.6 3.8-4.9L89.5 37.5z"/>
       </svg>
     ),
   },

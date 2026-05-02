@@ -5,7 +5,6 @@ import { Hero } from './components/sections/Hero/Hero'
 import { About } from './components/sections/About/About'
 import { Projects } from './components/sections/Projects/Projects'
 import { Stack } from './components/sections/Stack/Stack'
-import { Contact } from './components/sections/Contact/Contact'
 import { ProjectDetailPage } from './components/pages/ProjectDetailPage'
 import { AdminPage } from './components/pages/AdminPage'
 
@@ -18,7 +17,6 @@ function MainLayout() {
         <About />
         <Projects />
         <Stack />
-        <Contact />
       </main>
       <Footer />
     </>

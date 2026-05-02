@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import clsx from 'clsx'
+import { ContactModal } from '../ui/ContactModal'
 
 const navLinks = [
   { label: 'Parcours',  id: 'about'    },
@@ -16,6 +17,7 @@ export function NavBar() {
   const [activeSection, setActiveSection] = useState('')
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [contactOpen, setContactOpen] = useState(false)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -39,6 +41,7 @@ export function NavBar() {
   }, [])
 
   return (
+    <>
     <nav className={clsx(
       'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
       scrolled
@@ -77,7 +80,7 @@ export function NavBar() {
             )
           })}
           <button
-            onClick={() => scrollTo('contact')}
+            onClick={() => setContactOpen(true)}
             className="ml-3 btn-primary text-xs py-2 px-4"
           >
             Me contacter
@@ -109,7 +112,7 @@ export function NavBar() {
             </button>
           ))}
           <button
-            onClick={() => { scrollTo('contact'); setMenuOpen(false) }}
+            onClick={() => { setContactOpen(true); setMenuOpen(false) }}
             className="mt-2 btn-primary justify-center"
           >
             Me contacter
@@ -117,5 +120,8 @@ export function NavBar() {
         </div>
       )}
     </nav>
+
+    <ContactModal isOpen={contactOpen} onClose={() => setContactOpen(false)} />
+    </>
   )
 }

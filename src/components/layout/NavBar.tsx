@@ -6,7 +6,6 @@ const navLinks = [
   { label: 'Parcours',  id: 'about'    },
   { label: 'Projets',   id: 'projects' },
   { label: 'Stack',     id: 'stack'    },
-  { label: 'Contact',   id: 'contact'  },
 ]
 
 function scrollTo(id: string) {

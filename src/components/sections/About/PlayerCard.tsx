@@ -143,9 +143,6 @@ export function PlayerCard() {
               <p className="font-display font-bold text-white text-base leading-tight">Ibrahim CISSE</p>
               <p className="text-brand-pink text-[11px] font-mono mt-1 tracking-wider">GTM · AI · Creator</p>
             </div>
-            <div className="border border-brand-pink/30 rounded px-3 py-1">
-              <span className="text-brand-pink text-xs font-mono tracking-widest">BUILDER</span>
-            </div>
           </div>
 
           {/* 2 — Big overall circle */}

@@ -3,9 +3,9 @@ import clsx from 'clsx'
 import { ContactModal } from '../ui/ContactModal'
 
 const navLinks = [
-  { label: 'Parcours',  id: 'about'    },
   { label: 'Projets',   id: 'projects' },
   { label: 'Stack',     id: 'stack'    },
+  { label: 'Parcours',  id: 'about'    },
 ]
 
 function scrollTo(id: string) {

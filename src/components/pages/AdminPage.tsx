@@ -182,7 +182,7 @@ export function AdminPage() {
   const [acadEntries, setAcadEntries]   = useState<AcademicEntry[]>(() => getAcademic())
   const [customAcad, setCustomAcad]     = useState(() => isUsingCustomAcademic())
   const [editingAcad, setEditingAcad]   = useState<string | null>(null)
-  const [acadForm, setAcadForm]         = useState<AcademicEntry>(emptyAcadForm())
+  const [acadForm, setAcadForm]         = useState<AcadFormData>(emptyAcadForm())
 
   // ── Auth ───────────────────────────────────────────────────────────────────
   const handleLogin = () => {

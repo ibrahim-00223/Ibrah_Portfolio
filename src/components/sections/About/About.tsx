@@ -1,6 +1,5 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { CareerTimeline } from './CareerTimeline'
 import { PlayerCard } from './PlayerCard'
 
 const fadeUp = (delay = 0) => ({
@@ -34,25 +33,15 @@ export function About() {
           </div>
         </motion.div>
 
-        {/* ── Bloc 1 : Player Card ── */}
+        {/* ── Player Card ── */}
         <motion.div
           ref={block1Ref}
           initial={fadeUp(0.1).initial}
           animate={block1InView ? fadeUp(0.1).animate : {}}
           transition={fadeUp(0.1).transition}
-          className="mb-16"
         >
           <PlayerCard />
         </motion.div>
-
-        {/* ── Bloc 2 : Timeline (gère ses propres animations) ── */}
-        <div className="mb-16">
-          <p className="text-sm font-semibold text-text-tertiary tracking-widest uppercase mb-6">
-            Mon Parcours
-          </p>
-          <CareerTimeline />
-        </div>
-
 
       </div>
     </section>

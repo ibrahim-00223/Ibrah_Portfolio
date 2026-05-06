@@ -132,26 +132,26 @@ export function PlayerCard() {
         }}
       >
         {/* ══ TOP SECTION ══ */}
-        <div className="grid md:grid-cols-[180px_140px_1fr_160px] divide-y md:divide-y-0 md:divide-x divide-white/5">
+        <div className="grid md:grid-cols-[200px_170px_1fr_190px] divide-y md:divide-y-0 md:divide-x divide-white/5">
 
           {/* 1 — Identity */}
-          <div className="flex flex-col items-center justify-center gap-3 p-6">
-            <div className="w-[88px] h-[88px] rounded-xl overflow-hidden ring-2 ring-brand-pink/40">
+          <div className="flex flex-col items-center justify-center gap-3 p-7">
+            <div className="w-24 h-24 rounded-xl overflow-hidden ring-2 ring-brand-pink/40">
               <img src="./ibrahim.png" alt="Ibrahim CISSE" className="w-full h-full object-cover object-top" />
             </div>
             <div className="text-center">
-              <p className="font-display font-bold text-white text-sm leading-tight">Ibrahim CISSE</p>
-              <p className="text-brand-pink text-[9px] font-mono mt-0.5 tracking-wider">GTM · AI · Creator</p>
+              <p className="font-display font-bold text-white text-base leading-tight">Ibrahim CISSE</p>
+              <p className="text-brand-pink text-[11px] font-mono mt-1 tracking-wider">GTM · AI · Creator</p>
             </div>
             <div className="border border-brand-pink/30 rounded px-3 py-1">
-              <span className="text-brand-pink text-[10px] font-mono tracking-widest">BUILDER</span>
+              <span className="text-brand-pink text-xs font-mono tracking-widest">BUILDER</span>
             </div>
           </div>
 
           {/* 2 — Big overall circle */}
-          <div className="flex flex-col items-center justify-center gap-2 p-6">
-            <span className="text-[9px] font-mono tracking-[0.18em] text-white/30 uppercase">Overall</span>
-            <div className="relative flex items-center justify-center" style={{ width: 96, height: 96 }}>
+          <div className="flex flex-col items-center justify-center gap-3 p-7">
+            <span className="text-xs font-mono tracking-[0.12em] text-white/50 uppercase font-semibold">Overall</span>
+            <div className="relative flex items-center justify-center" style={{ width: 112, height: 112 }}>
               <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
                 <circle cx="50" cy="50" r={BIG_R} fill="none" stroke="rgba(230,0,76,0.12)" strokeWidth="6" />
                 <motion.circle
@@ -164,27 +164,27 @@ export function PlayerCard() {
                 />
               </svg>
               <div className="relative flex flex-col items-center z-10">
-                <span className="text-white/40 text-[8px] font-mono tracking-widest leading-none">GTM</span>
-                <span className="font-display font-bold text-white leading-none mt-0.5" style={{ fontSize: 32 }}>{OVERALL}</span>
+                <span className="text-white/40 text-[10px] font-mono tracking-widest leading-none">GTM</span>
+                <span className="font-display font-bold text-white leading-none mt-0.5" style={{ fontSize: 36 }}>{OVERALL}</span>
               </div>
             </div>
           </div>
 
           {/* 3 — Radar */}
-          <div className="flex flex-col items-center justify-center p-6 gap-2">
-            <span className="text-[9px] font-mono tracking-[0.18em] text-white/30 uppercase">Radar</span>
-            <div className="w-full max-w-[160px] aspect-square">
+          <div className="flex flex-col items-center justify-center p-7 gap-3">
+            <span className="text-xs font-mono tracking-[0.12em] text-white/50 uppercase font-semibold">Radar</span>
+            <div className="w-full max-w-[190px] aspect-square">
               <RadarChart animated={inView} />
             </div>
           </div>
 
           {/* 4 — Module averages */}
-          <div className="flex flex-col justify-center p-6 gap-2.5">
-            <span className="text-[9px] font-mono tracking-[0.18em] text-white/30 uppercase mb-0.5">Stats</span>
+          <div className="flex flex-col justify-center p-7 gap-3">
+            <span className="text-xs font-mono tracking-[0.12em] text-white/50 uppercase font-semibold mb-1">Stats</span>
             {STATS.map((s, i) => (
-              <div key={s.short} className="flex items-center gap-2">
-                <span className="text-white/50 text-[10px] font-mono w-8 shrink-0">{s.short}</span>
-                <div className="flex-1 h-[3px] rounded-full bg-white/10 overflow-hidden">
+              <div key={s.short} className="flex items-center gap-2.5">
+                <span className="text-white/60 text-xs font-mono font-semibold w-9 shrink-0">{s.short}</span>
+                <div className="flex-1 h-1 rounded-full bg-white/10 overflow-hidden">
                   <motion.div
                     className="h-full rounded-full"
                     style={{ backgroundColor: skillColor(s.value) }}
@@ -193,7 +193,7 @@ export function PlayerCard() {
                     transition={{ duration: 0.7, delay: 0.3 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
                   />
                 </div>
-                <span className="text-white text-[11px] font-mono font-bold w-6 text-right shrink-0">{s.value}</span>
+                <span className="text-white text-sm font-mono font-bold w-7 text-right shrink-0">{s.value}</span>
               </div>
             ))}
           </div>

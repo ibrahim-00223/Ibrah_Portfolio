@@ -90,10 +90,9 @@ export function HeroPrompt() {
 
               <motion.div variants={item} className="flex flex-wrap gap-3 pt-2">
                 {[
-                  { href: '#about', label: '[01] parcours' },
-                  { href: '#projects', label: '[02] projets' },
-                  { href: '#stack', label: '[03] stack' },
-                  { href: '#contact', label: '[04] contact' },
+                  { href: '#projects', label: '[01] projets' },
+                  { href: '#stack', label: '[02] stack' },
+                  { href: '#about', label: '[03] parcours' },
                 ].map(({ href, label }) => (
                   <a
                     key={href}

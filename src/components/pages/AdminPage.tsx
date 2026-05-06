@@ -6,6 +6,8 @@ import clsx from 'clsx'
 import { getProjects, saveProjects, resetProjects, isUsingCustomProjects } from '../../data/projectsStore'
 import { getTimeline, saveTimeline, resetTimeline, isUsingCustomTimeline } from '../../data/timelineStore'
 import { getStackNodes, saveStack, resetStack, isUsingCustomStack } from '../../data/stackStore'
+import { getStatus, saveStatus, resetStatus } from '../../data/statusStore'
+import type { StatusData } from '../../data/statusStore'
 
 import type { Project } from '../../data/projects'
 import type { TimelinePhase } from '../../data/timeline'
@@ -16,7 +18,7 @@ import { groupLabels } from '../../data/stack'
 const ADMIN_PASSWORD = 'Ibrahim2025'
 const SESSION_KEY    = 'portfolio_admin_auth'
 
-type Tab = 'projets' | 'experiences' | 'stack'
+type Tab = 'projets' | 'experiences' | 'stack' | 'statut'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // PROJETS
@@ -139,6 +141,9 @@ export function AdminPage() {
   const [customStack, setCustomStack] = useState(() => isUsingCustomStack())
   const [editingStack, setEditingStack] = useState<string | null>(null)
   const [stackForm, setStackForm]     = useState<StackFormData>(emptyStackForm())
+
+  // ── STATUT state ───────────────────────────────────────────────────────────
+  const [statusForm, setStatusForm] = useState<StatusData>(() => getStatus())
 
   // ── Auth ───────────────────────────────────────────────────────────────────
   const handleLogin = () => {
@@ -331,7 +336,8 @@ export function AdminPage() {
             { key: 'projets',     label: 'Projets',      count: projects.length },
             { key: 'experiences', label: 'Expériences',  count: phases.length   },
             { key: 'stack',       label: 'Stack',        count: nodes.length    },
-          ] as { key: Tab; label: string; count: number }[]).map(t => (
+            { key: 'statut',      label: 'Statut',       count: null            },
+          ] as { key: Tab; label: string; count: number | null }[]).map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
               className={clsx(
                 'px-5 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px',
@@ -340,12 +346,14 @@ export function AdminPage() {
                   : 'text-text-secondary border-transparent hover:text-white'
               )}>
               {t.label}
-              <span className={clsx(
-                'ml-2 text-xs font-mono px-1.5 py-0.5 rounded',
-                tab === t.key ? 'bg-brand-pink/20 text-brand-pink' : 'bg-white/5 text-text-tertiary'
-              )}>
-                {t.count}
-              </span>
+              {t.count !== null && (
+                <span className={clsx(
+                  'ml-2 text-xs font-mono px-1.5 py-0.5 rounded',
+                  tab === t.key ? 'bg-brand-pink/20 text-brand-pink' : 'bg-white/5 text-text-tertiary'
+                )}>
+                  {t.count}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -577,6 +585,67 @@ export function AdminPage() {
               )
             })}
             {nodes.length === 0 && <EmptyState label="technologie" onAdd={() => { setStackForm(emptyStackForm()); setEditingStack('new') }} />}
+          </div>
+        )}
+
+        {/* ═══ ONGLET STATUT ════════════════════════════════════════════════ */}
+        {tab === 'statut' && (
+          <div className="space-y-6 max-w-md">
+            <div className="card p-6 space-y-5">
+              <h2 className="font-semibold text-white">Badge de disponibilité</h2>
+
+              <Field label="Texte du badge">
+                <input
+                  value={statusForm.label}
+                  onChange={e => setStatusForm(f => ({ ...f, label: e.target.value }))}
+                  className="admin-input"
+                  placeholder="Disponible · Paris"
+                />
+              </Field>
+
+              <Field label="Statut">
+                <div className="flex gap-3">
+                  {[
+                    { value: true,  label: '🟢 Disponible' },
+                    { value: false, label: '⚫ Non disponible' },
+                  ].map(opt => (
+                    <button
+                      key={String(opt.value)}
+                      onClick={() => setStatusForm(f => ({ ...f, available: opt.value }))}
+                      className={clsx(
+                        'flex-1 py-2 px-3 rounded-lg border text-sm transition-all',
+                        statusForm.available === opt.value
+                          ? 'border-brand-pink bg-brand-pink/10 text-white'
+                          : 'border-border text-text-secondary hover:text-white'
+                      )}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </Field>
+
+              {/* Aperçu */}
+              <div className="flex items-center gap-2 bg-bg-surface border border-border rounded-full px-3 py-1.5 w-fit">
+                <span className={`w-2 h-2 rounded-full ${statusForm.available ? 'bg-brand-pink' : 'bg-white/30'}`} />
+                <span className="text-xs text-text-secondary whitespace-nowrap">{statusForm.label || 'Aperçu…'}</span>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => { saveStatus(statusForm); flash('Statut sauvegardé ✓') }}
+                  className="btn-primary text-sm"
+                >
+                  Sauvegarder
+                </button>
+                <button
+                  onClick={() => { resetStatus(); setStatusForm(getStatus()); flash('Réinitialisé ✓') }}
+                  className="btn-ghost text-sm"
+                >
+                  Réinitialiser
+                </button>
+              </div>
+            </div>
           </div>
         )}
 

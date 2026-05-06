@@ -11,10 +11,13 @@ const statusConfig = {
 }
 
 function ProjectThumbnail({ project }: { project: Project }) {
-  if (project.thumbnail) {
+  const src = project.thumbnail
+    ?? (project.youtubeId ? `https://img.youtube.com/vi/${project.youtubeId}/hqdefault.jpg` : null)
+
+  if (src) {
     return (
       <img
-        src={project.thumbnail}
+        src={src}
         alt={project.name}
         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
       />

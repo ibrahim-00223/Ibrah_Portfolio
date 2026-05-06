@@ -14,9 +14,9 @@ function MainLayout() {
       <NavBar />
       <main>
         <Hero />
-        <About />
         <Projects />
         <Stack />
+        <About />
       </main>
       <Footer />
     </>

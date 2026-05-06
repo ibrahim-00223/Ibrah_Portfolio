@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
+import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { ParcourModal } from './ParcourModal'
 import { getScorecard, moduleValue } from '../../../data/scorecardStore'
 
@@ -60,30 +60,51 @@ function RadarChart({ animated }: { animated: boolean }) {
   )
 }
 
-// ── FIFA-style circular skill badge ───────────────────────────────────────────
-function SkillBadge({ name, value, delay, animated }: {
-  name: string; value: number; delay: number; animated: boolean
-}) {
-  const R = 19, CIRC = 2 * Math.PI * R
+// ── Large module circle (bottom grid) ─────────────────────────────────────────
+function ModuleCircle({ value, delay, animated }: { value: number; delay: number; animated: boolean }) {
+  const R = 28, CIRC = 2 * Math.PI * R
   const color = skillColor(value)
   return (
-    <div className="flex flex-col items-center gap-1">
-      <svg viewBox="0 0 46 46" className="w-11 h-11">
-        <circle cx="23" cy="23" r={R} fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.06)" strokeWidth="2" />
+    <svg viewBox="0 0 64 64" className="w-16 h-16">
+      <circle cx="32" cy="32" r={R} fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
+      <motion.circle
+        cx="32" cy="32" r={R} fill="none" stroke={color} strokeWidth="3" strokeLinecap="round"
+        strokeDasharray={CIRC}
+        initial={{ strokeDashoffset: CIRC }}
+        animate={animated ? { strokeDashoffset: CIRC * (1 - value / 100) } : { strokeDashoffset: CIRC }}
+        transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
+        style={{ transform: 'rotate(-90deg)', transformOrigin: '32px 32px' }}
+      />
+      <text x="32" y="32" textAnchor="middle" dominantBaseline="middle"
+        fill="white" style={{ fontSize: 15, fontWeight: 700, fontFamily: 'ui-monospace,monospace' }}>
+        {value}
+      </text>
+    </svg>
+  )
+}
+
+// ── Small skill badge (inside module popup) ────────────────────────────────────
+function SkillBadge({ name, value }: { name: string; value: number }) {
+  const R = 22, CIRC = 2 * Math.PI * R
+  const color = skillColor(value)
+  return (
+    <div className="flex flex-col items-center gap-1.5">
+      <svg viewBox="0 0 52 52" className="w-14 h-14">
+        <circle cx="26" cy="26" r={R} fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.06)" strokeWidth="2.5" />
         <motion.circle
-          cx="23" cy="23" r={R} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round"
+          cx="26" cy="26" r={R} fill="none" stroke={color} strokeWidth="3" strokeLinecap="round"
           strokeDasharray={CIRC}
           initial={{ strokeDashoffset: CIRC }}
-          animate={animated ? { strokeDashoffset: CIRC * (1 - value / 100) } : { strokeDashoffset: CIRC }}
-          transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
-          style={{ transform: 'rotate(-90deg)', transformOrigin: '23px 23px' }}
+          animate={{ strokeDashoffset: CIRC * (1 - value / 100) }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          style={{ transform: 'rotate(-90deg)', transformOrigin: '26px 26px' }}
         />
-        <text x="23" y="23" textAnchor="middle" dominantBaseline="middle"
-          fill="white" style={{ fontSize: 11, fontWeight: 700, fontFamily: 'ui-monospace,monospace' }}>
+        <text x="26" y="26" textAnchor="middle" dominantBaseline="middle"
+          fill="white" style={{ fontSize: 13, fontWeight: 700, fontFamily: 'ui-monospace,monospace' }}>
           {value}
         </text>
       </svg>
-      <span className="text-white/35 text-[8px] font-mono text-center leading-tight w-12">{name}</span>
+      <span className="text-white/50 text-[9px] font-mono text-center leading-tight w-14">{name}</span>
     </div>
   )
 }
@@ -92,7 +113,8 @@ function SkillBadge({ name, value, delay, animated }: {
 export function PlayerCard() {
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '-60px' })
-  const [modalOpen, setModalOpen] = useState(false)
+  const [parcourOpen, setParcourOpen] = useState(false)
+  const [openModule, setOpenModule]   = useState<number | null>(null)
 
   const BIG_R = 44, BIG_C = 2 * Math.PI * BIG_R
 
@@ -109,7 +131,6 @@ export function PlayerCard() {
           boxShadow: '0 0 0 1px rgba(230,0,76,0.15), 0 24px 60px rgba(0,0,0,0.6)',
         }}
       >
-
         {/* ══ TOP SECTION ══ */}
         <div className="grid md:grid-cols-[180px_140px_1fr_160px] divide-y md:divide-y-0 md:divide-x divide-white/5">
 
@@ -181,26 +202,23 @@ export function PlayerCard() {
         {/* ══ DIVIDER ══ */}
         <div className="h-px bg-white/5" />
 
-        {/* ══ BOTTOM SECTION — 5 category columns ══ */}
+        {/* ══ BOTTOM SECTION — one circle per module, click to reveal skills ══ */}
         <div className="overflow-x-auto">
-          <div className="grid grid-cols-5 divide-x divide-white/5" style={{ minWidth: 500 }}>
+          <div className="grid grid-cols-5 divide-x divide-white/5" style={{ minWidth: 480 }}>
             {STATS.map((s, si) => (
-              <div key={s.label} className="p-4">
-                <p className="text-[9px] font-mono tracking-[0.15em] text-white/30 uppercase text-center mb-3">
+              <button
+                key={s.label}
+                onClick={() => setOpenModule(si)}
+                className="flex flex-col items-center gap-3 p-5 hover:bg-white/[0.03] transition-colors group"
+              >
+                <span className="text-[9px] font-mono tracking-[0.15em] text-white/30 uppercase group-hover:text-white/50 transition-colors">
                   {s.label}
-                </p>
-                <div className="grid grid-cols-2 gap-x-1 gap-y-2 justify-items-center">
-                  {s.skills.map((sk, ki) => (
-                    <SkillBadge
-                      key={sk.name}
-                      name={sk.name}
-                      value={sk.value}
-                      animated={inView}
-                      delay={0.5 + si * 0.1 + ki * 0.06}
-                    />
-                  ))}
-                </div>
-              </div>
+                </span>
+                <ModuleCircle value={s.value} delay={0.4 + si * 0.08} animated={inView} />
+                <span className="text-[8px] font-mono text-white/20 group-hover:text-brand-pink/60 transition-colors">
+                  {s.skills.length} skills ↗
+                </span>
+              </button>
             ))}
           </div>
         </div>
@@ -208,7 +226,7 @@ export function PlayerCard() {
         {/* ══ MON PARCOURS BUTTON ══ */}
         <div className="border-t border-white/5 px-6 py-4 flex justify-center">
           <button
-            onClick={() => setModalOpen(true)}
+            onClick={() => setParcourOpen(true)}
             className="flex items-center gap-2 px-6 py-2.5 rounded-xl border border-brand-pink/30 text-brand-pink text-xs font-mono tracking-widest hover:bg-brand-pink/10 hover:border-brand-pink/60 transition-all duration-200"
           >
             MON PARCOURS
@@ -219,7 +237,63 @@ export function PlayerCard() {
         </div>
       </motion.div>
 
-      <ParcourModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+      {/* ══ MODULE SKILLS POPUP ══ */}
+      <AnimatePresence>
+        {openModule !== null && (() => {
+          const mod = STATS[openModule]
+          return (
+            <>
+              <motion.div
+                className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                onClick={() => setOpenModule(null)}
+              />
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+                <motion.div
+                  className="pointer-events-auto w-full max-w-xs rounded-2xl border border-border overflow-hidden"
+                  style={{
+                    background: 'linear-gradient(135deg, #0d0d1a 0%, #12080f 60%, #0d0d1a 100%)',
+                    boxShadow: '0 0 0 1px rgba(230,0,76,0.2), 0 24px 60px rgba(0,0,0,0.8)',
+                  }}
+                  initial={{ opacity: 0, scale: 0.92, y: 12 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.92, y: 12 }}
+                  transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  {/* Header */}
+                  <div className="flex items-center justify-between px-5 pt-5 pb-4">
+                    <div>
+                      <p className="text-[9px] font-mono text-brand-pink/60 tracking-widest uppercase mb-0.5">{mod.short}</p>
+                      <h3 className="font-display font-bold text-white text-base">{mod.label}</h3>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0"
+                        style={{ borderColor: skillColor(mod.value) }}>
+                        <span className="text-white font-mono font-bold text-sm">{mod.value}</span>
+                      </div>
+                      <button
+                        onClick={() => setOpenModule(null)}
+                        className="w-7 h-7 flex items-center justify-center rounded-lg border border-border text-white/30 hover:text-white transition-colors text-sm"
+                      >✕</button>
+                    </div>
+                  </div>
+
+                  <div className="h-px bg-white/5" />
+
+                  {/* Skills grid */}
+                  <div className="grid grid-cols-2 gap-4 p-5 justify-items-center">
+                    {mod.skills.map((sk) => (
+                      <SkillBadge key={sk.name} name={sk.name} value={sk.value} />
+                    ))}
+                  </div>
+                </motion.div>
+              </div>
+            </>
+          )
+        })()}
+      </AnimatePresence>
+
+      <ParcourModal isOpen={parcourOpen} onClose={() => setParcourOpen(false)} />
     </>
   )
 }

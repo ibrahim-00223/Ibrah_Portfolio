@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { HeroFlipCard } from './HeroFlipCard'
 
 const container = {
   hidden: {},
@@ -28,47 +29,8 @@ export function Hero() {
       <div className="section-inner relative z-10 py-16">
         <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
 
-          {/* ── LEFT : Photo ── */}
-          <motion.div
-            className="flex justify-center md:justify-start order-2 md:order-1"
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className="relative">
-              {/* Pink accent border bottom-right */}
-              <div
-                className="absolute -bottom-3 -right-3 w-full h-full rounded-2xl border border-brand-pink opacity-20 pointer-events-none"
-              />
-              {/* Second subtle border */}
-              <div
-                className="absolute -bottom-1.5 -right-1.5 w-full h-full rounded-2xl border border-brand-pink opacity-10 pointer-events-none"
-              />
-
-              <img
-                src="./ibrahim.png"
-                alt="Ibrahim CISSE"
-                className="relative z-10 w-64 md:w-72 lg:w-80 rounded-2xl object-cover object-top"
-                style={{
-                  aspectRatio: '3/4',
-                  boxShadow: '0 24px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06)',
-                }}
-              />
-
-              {/* Floating status badge */}
-              <motion.div
-                className="absolute -bottom-4 left-4 z-20 flex items-center gap-2 bg-bg-surface border border-border rounded-full px-3 py-1.5 shadow-lg"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 0.4 }}
-              >
-                <span className="w-2 h-2 rounded-full bg-brand-pink animate-pulse-pink" />
-                <span className="text-xs text-text-secondary whitespace-nowrap">
-                  Disponible · Paris
-                </span>
-              </motion.div>
-            </div>
-          </motion.div>
+          {/* ── LEFT : Flip Card ── */}
+          <HeroFlipCard />
 
           {/* ── RIGHT : Content ── */}
           <motion.div

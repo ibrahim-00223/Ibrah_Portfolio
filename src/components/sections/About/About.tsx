@@ -28,7 +28,7 @@ export function About() {
         >
           <p className="section-eyebrow">03 — Parcours</p>
           <div className="flex items-end gap-6 mb-4">
-            <h2 className="font-display text-display-lg text-white">À propos de moi</h2>
+            <h2 className="font-display text-display-lg text-white">Score Card</h2>
             <div className="accent-line mb-3" />
           </div>
         </motion.div>

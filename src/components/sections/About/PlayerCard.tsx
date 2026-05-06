@@ -211,7 +211,7 @@ export function PlayerCard() {
                 onClick={() => setOpenModule(si)}
                 className="flex flex-col items-center gap-3 p-5 hover:bg-white/[0.03] transition-colors group"
               >
-                <span className="text-[9px] font-mono tracking-[0.15em] text-white/30 uppercase group-hover:text-white/50 transition-colors">
+                <span className="text-[11px] font-mono tracking-[0.12em] text-white/50 uppercase group-hover:text-white/70 transition-colors font-semibold">
                   {s.label}
                 </span>
                 <ModuleCircle value={s.value} delay={0.4 + si * 0.08} animated={inView} />

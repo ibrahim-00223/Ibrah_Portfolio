@@ -10,6 +10,8 @@ import { getStatus, saveStatus, resetStatus } from '../../data/statusStore'
 import type { StatusData } from '../../data/statusStore'
 import { getScorecard, saveScorecard, resetScorecard, isUsingCustomScorecard, moduleValue } from '../../data/scorecardStore'
 import type { StatModule } from '../../data/scorecardStore'
+import { getAcademic, saveAcademic, resetAcademic, isUsingCustomAcademic } from '../../data/academicStore'
+import type { AcademicEntry } from '../../data/academicStore'
 
 import type { Project } from '../../data/projects'
 import type { TimelinePhase } from '../../data/timeline'
@@ -20,7 +22,7 @@ import { groupLabels } from '../../data/stack'
 const ADMIN_PASSWORD = 'Ibrahim2025'
 const SESSION_KEY    = 'portfolio_admin_auth'
 
-type Tab = 'projets' | 'experiences' | 'stack' | 'statut' | 'scorecard'
+type Tab = 'projets' | 'experiences' | 'stack' | 'statut' | 'scorecard' | 'academique'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // PROJETS
@@ -106,6 +108,28 @@ const formToExp = (f: ExpFormData): TimelinePhase => {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// ACADÉMIQUE
+// ═══════════════════════════════════════════════════════════════════════════════
+type AcadFormData = Omit<AcademicEntry, 'tags'> & { tagsStr: string }
+
+const emptyAcadForm = (): AcadFormData => ({
+  id: '', period: '', title: '', school: '', description: '', tagsStr: '', color: 'amber',
+})
+
+const acadToForm = (e: AcademicEntry): AcadFormData => ({ ...e, tagsStr: e.tags.join(', ') })
+
+const formToAcad = (f: AcadFormData): AcademicEntry => {
+  const id = (f.id.trim() || f.title).toLowerCase().trim()
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+  return {
+    id, period: f.period.trim(), title: f.title.trim(),
+    school: f.school.trim(), description: f.description.trim(),
+    color: f.color,
+    tags: f.tagsStr.split(',').map(t => t.trim()).filter(Boolean),
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // STACK
 // ═══════════════════════════════════════════════════════════════════════════════
 const GROUP_OPTIONS = Object.keys(groupLabels) as StackNode['group'][]
@@ -153,6 +177,12 @@ export function AdminPage() {
   const [scModules, setScModules]     = useState<StatModule[]>(() => getScorecard())
   const [customSc, setCustomSc]       = useState(() => isUsingCustomScorecard())
   const [expandedMod, setExpandedMod] = useState<number | null>(null)
+
+  // ── ACADÉMIQUE state ───────────────────────────────────────────────────────
+  const [acadEntries, setAcadEntries]   = useState<AcademicEntry[]>(() => getAcademic())
+  const [customAcad, setCustomAcad]     = useState(() => isUsingCustomAcademic())
+  const [editingAcad, setEditingAcad]   = useState<string | null>(null)
+  const [acadForm, setAcadForm]         = useState<AcademicEntry>(emptyAcadForm())
 
   // ── Auth ───────────────────────────────────────────────────────────────────
   const handleLogin = () => {
@@ -263,6 +293,29 @@ export function AdminPage() {
   }
 
   // ════════════════════════════════════════════════════════════════════════════
+  // ACADÉMIQUE handlers
+  // ════════════════════════════════════════════════════════════════════════════
+  const persistAcad = (updated: AcademicEntry[]) => {
+    saveAcademic(updated); setAcadEntries(getAcademic()); setCustomAcad(true); flash()
+  }
+  const handleAcadSave = () => {
+    const entry = formToAcad(acadForm)
+    const updated = editingAcad === 'new'
+      ? [...acadEntries, entry]
+      : acadEntries.map(e => e.id === editingAcad ? entry : e)
+    persistAcad(updated); setEditingAcad(null)
+  }
+  const handleAcadDelete = (id: string) => {
+    if (!confirm(`Supprimer "${acadEntries.find(e => e.id === id)?.title}" ?`)) return
+    persistAcad(acadEntries.filter(e => e.id !== id))
+  }
+  const handleAcadReorder = (id: string, dir: -1 | 1) => {
+    const idx = acadEntries.findIndex(e => e.id === id)
+    const next = idx + dir; if (next < 0 || next >= acadEntries.length) return
+    const arr = [...acadEntries]; [arr[idx], arr[next]] = [arr[next], arr[idx]]; persistAcad(arr)
+  }
+
+  // ════════════════════════════════════════════════════════════════════════════
   // ÉCRAN DE CONNEXION
   // ════════════════════════════════════════════════════════════════════════════
   if (!authed) {
@@ -347,6 +400,7 @@ export function AdminPage() {
             { key: 'stack',       label: 'Stack',        count: nodes.length    },
             { key: 'statut',      label: 'Statut',       count: null            },
             { key: 'scorecard',   label: 'Score Card',   count: scModules.length },
+            { key: 'academique',  label: 'Académique',   count: acadEntries.length },
           ] as { key: Tab; label: string; count: number | null }[]).map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
               className={clsx(
@@ -891,6 +945,69 @@ export function AdminPage() {
               >
                 Sauvegarder la Score Card
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* ═══ ONGLET ACADÉMIQUE ════════════════════════════════════════════ */}
+        {tab === 'academique' && (
+          <div className="space-y-6">
+            <StatusBanner custom={customAcad} count={acadEntries.length} label="entrée académique"
+              onReset={() => { resetAcademic(); setAcadEntries(getAcademic()); setCustomAcad(false); flash('Réinitialisé ✓') }} />
+
+            <div className="flex flex-wrap gap-3">
+              <button onClick={() => { setAcadForm(emptyAcadForm()); setEditingAcad('new') }} className="btn-primary text-sm">
+                + Nouvelle entrée
+              </button>
+            </div>
+
+            <AnimatePresence>
+              {editingAcad !== null && (
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+                  <div className="card border-brand-pink/20 p-6 space-y-5">
+                    <div className="flex items-center justify-between">
+                      <h2 className="font-semibold text-white">
+                        {editingAcad === 'new' ? 'Nouvelle entrée académique' : `Modifier — ${acadForm.title || '…'}`}
+                      </h2>
+                      <CloseBtn onClick={() => setEditingAcad(null)} />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Field label="Titre *"><input value={acadForm.title} onChange={e => setAcadForm(f=>({...f,title:e.target.value}))} className="admin-input" placeholder="BTS Management Commercial" /></Field>
+                      <Field label="École / Formation"><input value={acadForm.school} onChange={e => setAcadForm(f=>({...f,school:e.target.value}))} className="admin-input" placeholder="Formation initiale" /></Field>
+                      <Field label="Période *"><input value={acadForm.period} onChange={e => setAcadForm(f=>({...f,period:e.target.value}))} className="admin-input" placeholder="2019 — 2021" /></Field>
+                      <Field label="Couleur">
+                        <select value={acadForm.color} onChange={e => setAcadForm(f=>({...f,color:e.target.value as AcademicEntry['color']}))} className="admin-input">
+                          {COLOR_OPTIONS.map(c => <option key={c} value={c}>{COLOR_LABELS[c]}</option>)}
+                        </select>
+                      </Field>
+                      <Field label="Description *" className="md:col-span-2"><textarea value={acadForm.description} onChange={e => setAcadForm(f=>({...f,description:e.target.value}))} rows={3} className="admin-input resize-y" /></Field>
+                      <Field label="Compétences (virgules)" className="md:col-span-2"><input value={acadForm.tagsStr} onChange={e => setAcadForm(f=>({...f,tagsStr:e.target.value}))} className="admin-input" placeholder="Commerce, Négociation, Management" /></Field>
+                      <Field label="Slug (ID)"><input value={acadForm.id} onChange={e => setAcadForm(f=>({...f,id:e.target.value}))} className="admin-input" placeholder="bts (auto depuis le titre)" /></Field>
+                    </div>
+                    <FormActions onSave={handleAcadSave} onCancel={() => setEditingAcad(null)}
+                      disabled={!acadForm.title.trim() || !acadForm.period.trim() || !acadForm.description.trim()} />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div className="space-y-2">
+              {acadEntries.map((e, i) => {
+                const dotColor = e.color === 'amber' ? '#ffb000' : e.color === 'cyan' ? '#00d4ff' : '#E6004C'
+                return (
+                  <motion.div key={e.id} layout className="card px-5 py-4 flex items-center gap-4">
+                    <ReorderBtns onUp={() => handleAcadReorder(e.id,-1)} onDown={() => handleAcadReorder(e.id,1)} disabledUp={i===0} disabledDown={i===acadEntries.length-1} />
+                    <div className="w-3 h-3 rounded-full shrink-0" style={{ background: dotColor }} />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-white text-sm">{e.title}<span className="text-text-tertiary ml-2 text-xs font-mono">@ {e.school}</span></div>
+                      <div className="text-text-tertiary text-xs mt-0.5">{e.period}</div>
+                    </div>
+                    <RowActions onEdit={() => { setAcadForm(acadToForm(e)); setEditingAcad(e.id) }} onDelete={() => handleAcadDelete(e.id)} />
+                  </motion.div>
+                )
+              })}
+              {acadEntries.length === 0 && <EmptyState label="entrée académique" onAdd={() => { setAcadForm(emptyAcadForm()); setEditingAcad('new') }} />}
             </div>
           </div>
         )}

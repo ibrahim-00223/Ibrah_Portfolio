@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getTimeline } from '../../../data/timelineStore'
+import { getAcademic } from '../../../data/academicStore'
 
 type Tab = 'experiences' | 'academic'
 
@@ -9,33 +10,6 @@ const colorMap = {
   cyan:  { dot: 'bg-[#00d4ff]', line: 'bg-[#00d4ff]/30', text: 'text-[#00d4ff]', period: 'text-[#00d4ff]/60' },
   green: { dot: 'bg-brand-pink', line: 'bg-brand-pink/30', text: 'text-brand-pink', period: 'text-brand-pink/60' },
 }
-
-const ACADEMIC = [
-  {
-    period: '2019 — 2021',
-    title: 'BTS Management Commercial',
-    school: 'Formation initiale',
-    description: 'Bases en gestion commerciale, négociation et management. Développement des compétences en relation client, stratégie commerciale et pilotage d\'équipe.',
-    tags: ['Commerce', 'Négociation', 'Management', 'Marketing'],
-    color: 'amber' as const,
-  },
-  {
-    period: '2021 — 2024',
-    title: 'Growth & Stratégie Éditoriale',
-    school: 'Auto-formation',
-    description: 'Maîtrise du SEO YouTube, stratégie de contenu, growth hacking et analytics. +100 vidéos produites et une compréhension fine de l\'algorithme.',
-    tags: ['SEO YouTube', 'Content Strategy', 'Analytics', 'Storytelling'],
-    color: 'cyan' as const,
-  },
-  {
-    period: '2024 — Présent',
-    title: 'IA & Ingénierie Logicielle',
-    school: 'DeepLearning.AI · Anthropic · OpenAI',
-    description: 'LLMs, systèmes multi-agents, Python, FastAPI et automatisation. Application directe en production chez Scalefast avec des résultats mesurables.',
-    tags: ['Python', 'LLM', 'Multi-agent', 'FastAPI', 'Prompt Engineering'],
-    color: 'green' as const,
-  },
-]
 
 function Timeline<T extends { color: 'amber' | 'cyan' | 'green' }>({
   items,
@@ -87,7 +61,8 @@ interface Props {
 
 export function ParcourModal({ isOpen, onClose }: Props) {
   const [tab, setTab] = useState<Tab>('experiences')
-  const phases = getTimeline()
+  const phases  = getTimeline()
+  const academic = getAcademic()
 
   return (
     <AnimatePresence>
@@ -185,7 +160,7 @@ export function ParcourModal({ isOpen, onClose }: Props) {
                       transition={{ duration: 0.15 }}
                     >
                       <Timeline
-                        items={ACADEMIC}
+                        items={academic}
                         renderContent={(item, c) => (
                           <>
                             <div className="flex items-start justify-between gap-3 mb-1.5">

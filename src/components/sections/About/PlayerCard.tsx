@@ -1,55 +1,10 @@
 import { useState, useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { ParcourModal } from './ParcourModal'
+import { getScorecard, moduleValue } from '../../../data/scorecardStore'
 
-const STATS = [
-  {
-    label: 'Business', short: 'BUS', value: 88,
-    skills: [
-      { name: 'Storytelling',    value: 92 },
-      { name: 'Sales Strategy',  value: 88 },
-      { name: 'Négociation',     value: 85 },
-      { name: 'Client Mgmt',     value: 87 },
-    ],
-  },
-  {
-    label: 'IA', short: 'AI', value: 82,
-    skills: [
-      { name: 'LLM / Prompting', value: 85 },
-      { name: 'Multi-agent',     value: 80 },
-      { name: 'AI Automation',   value: 82 },
-      { name: 'No-code AI',      value: 81 },
-    ],
-  },
-  {
-    label: 'Data', short: 'DAT', value: 74,
-    skills: [
-      { name: 'Data Enrichment', value: 78 },
-      { name: 'CRM Analytics',   value: 74 },
-      { name: 'Reporting',       value: 72 },
-      { name: 'SQL / Sheets',    value: 72 },
-    ],
-  },
-  {
-    label: 'Engineering', short: 'ENG', value: 70,
-    skills: [
-      { name: 'Python',          value: 73 },
-      { name: 'FastAPI',         value: 68 },
-      { name: 'API Integration', value: 72 },
-      { name: 'React / Web',     value: 67 },
-    ],
-  },
-  {
-    label: 'Proj. Mgmt', short: 'PM', value: 78,
-    skills: [
-      { name: 'GTM Planning',    value: 80 },
-      { name: 'Roadmapping',     value: 79 },
-      { name: 'Process Design',  value: 78 },
-      { name: 'Coordination',    value: 75 },
-    ],
-  },
-]
-
+const RAW = getScorecard()
+const STATS = RAW.map(m => ({ ...m, value: moduleValue(m) }))
 const OVERALL = Math.round(STATS.reduce((s, x) => s + x.value, 0) / STATS.length)
 
 function skillColor(v: number) {

@@ -8,6 +8,8 @@ import { getTimeline, saveTimeline, resetTimeline, isUsingCustomTimeline } from 
 import { getStackNodes, saveStack, resetStack, isUsingCustomStack } from '../../data/stackStore'
 import { getStatus, saveStatus, resetStatus } from '../../data/statusStore'
 import type { StatusData } from '../../data/statusStore'
+import { getScorecard, saveScorecard, resetScorecard, isUsingCustomScorecard, moduleValue } from '../../data/scorecardStore'
+import type { StatModule } from '../../data/scorecardStore'
 
 import type { Project } from '../../data/projects'
 import type { TimelinePhase } from '../../data/timeline'
@@ -18,7 +20,7 @@ import { groupLabels } from '../../data/stack'
 const ADMIN_PASSWORD = 'Ibrahim2025'
 const SESSION_KEY    = 'portfolio_admin_auth'
 
-type Tab = 'projets' | 'experiences' | 'stack' | 'statut'
+type Tab = 'projets' | 'experiences' | 'stack' | 'statut' | 'scorecard'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // PROJETS
@@ -146,6 +148,11 @@ export function AdminPage() {
 
   // ── STATUT state ───────────────────────────────────────────────────────────
   const [statusForm, setStatusForm] = useState<StatusData>(() => getStatus())
+
+  // ── SCORECARD state ────────────────────────────────────────────────────────
+  const [scModules, setScModules]     = useState<StatModule[]>(() => getScorecard())
+  const [customSc, setCustomSc]       = useState(() => isUsingCustomScorecard())
+  const [expandedMod, setExpandedMod] = useState<number | null>(null)
 
   // ── Auth ───────────────────────────────────────────────────────────────────
   const handleLogin = () => {
@@ -339,6 +346,7 @@ export function AdminPage() {
             { key: 'experiences', label: 'Expériences',  count: phases.length   },
             { key: 'stack',       label: 'Stack',        count: nodes.length    },
             { key: 'statut',      label: 'Statut',       count: null            },
+            { key: 'scorecard',   label: 'Score Card',   count: scModules.length },
           ] as { key: Tab; label: string; count: number | null }[]).map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
               className={clsx(
@@ -668,6 +676,221 @@ export function AdminPage() {
                   Réinitialiser
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ═══ ONGLET SCORE CARD ════════════════════════════════════════════ */}
+        {tab === 'scorecard' && (
+          <div className="space-y-6">
+            <StatusBanner custom={customSc} count={scModules.length} label="module"
+              onReset={() => {
+                resetScorecard()
+                setScModules(getScorecard())
+                setCustomSc(false)
+                setExpandedMod(null)
+                flash('Réinitialisé ✓')
+              }} />
+
+            {/* Overall preview */}
+            {(() => {
+              const overall = scModules.length
+                ? Math.round(scModules.reduce((s, m) => s + moduleValue(m), 0) / scModules.length)
+                : 0
+              return (
+                <div className="flex items-center gap-3 text-sm text-text-secondary">
+                  <span className="font-mono text-white/30 uppercase tracking-widest text-[10px]">Overall calculé</span>
+                  <span className="font-display font-bold text-white text-2xl">{overall}</span>
+                  <span className="text-white/20 text-xs">= moyenne des modules</span>
+                </div>
+              )
+            })()}
+
+            <div className="space-y-3">
+              {scModules.map((mod, mi) => {
+                const avg = moduleValue(mod)
+                const isOpen = expandedMod === mi
+                return (
+                  <div key={mi} className="card border border-border overflow-hidden">
+                    {/* Module header row */}
+                    <button
+                      className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-white/[0.02] transition-colors"
+                      onClick={() => setExpandedMod(isOpen ? null : mi)}
+                    >
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <span className="font-mono text-brand-pink text-xs w-10 shrink-0">{mod.short}</span>
+                        <span className="font-medium text-white text-sm">{mod.label}</span>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className="text-xs font-mono text-white/40">{mod.skills.length} compétences</span>
+                        <div className="w-8 h-8 rounded-full border-2 border-brand-pink/40 flex items-center justify-center">
+                          <span className="text-xs font-bold text-white font-mono">{avg}</span>
+                        </div>
+                        <span className="text-text-tertiary text-sm">{isOpen ? '▲' : '▼'}</span>
+                      </div>
+                    </button>
+
+                    {/* Expanded edit area */}
+                    <AnimatePresence>
+                      {isOpen && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="border-t border-border px-5 py-5 space-y-5 bg-white/[0.015]">
+                            {/* Module meta */}
+                            <div className="grid grid-cols-2 gap-3">
+                              <Field label="Nom du module">
+                                <input
+                                  value={mod.label}
+                                  onChange={e => {
+                                    const updated = [...scModules]
+                                    updated[mi] = { ...updated[mi], label: e.target.value }
+                                    setScModules(updated)
+                                  }}
+                                  className="admin-input"
+                                  placeholder="Business"
+                                />
+                              </Field>
+                              <Field label="Abréviation (radar)">
+                                <input
+                                  value={mod.short}
+                                  onChange={e => {
+                                    const updated = [...scModules]
+                                    updated[mi] = { ...updated[mi], short: e.target.value }
+                                    setScModules(updated)
+                                  }}
+                                  className="admin-input"
+                                  placeholder="BUS"
+                                  maxLength={4}
+                                />
+                              </Field>
+                            </div>
+
+                            {/* Skills list */}
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <label className="text-text-tertiary text-xs font-medium tracking-widest uppercase">
+                                  Compétences — moyenne : <span className="text-brand-pink font-bold">{avg}</span>
+                                </label>
+                              </div>
+                              {mod.skills.map((sk, ki) => (
+                                <div key={ki} className="flex items-center gap-3">
+                                  <input
+                                    value={sk.name}
+                                    onChange={e => {
+                                      const updated = [...scModules]
+                                      const skills = [...updated[mi].skills]
+                                      skills[ki] = { ...skills[ki], name: e.target.value }
+                                      updated[mi] = { ...updated[mi], skills }
+                                      setScModules(updated)
+                                    }}
+                                    className="admin-input flex-1"
+                                    placeholder="Nom de la compétence"
+                                  />
+                                  <div className="flex items-center gap-2 shrink-0">
+                                    <input
+                                      type="range" min={1} max={99} value={sk.value}
+                                      onChange={e => {
+                                        const updated = [...scModules]
+                                        const skills = [...updated[mi].skills]
+                                        skills[ki] = { ...skills[ki], value: +e.target.value }
+                                        updated[mi] = { ...updated[mi], skills }
+                                        setScModules(updated)
+                                      }}
+                                      className="w-28 accent-brand-pink"
+                                    />
+                                    <span className="text-white font-mono font-bold text-sm w-8 text-right">{sk.value}</span>
+                                  </div>
+                                  <RemoveBtn onClick={() => {
+                                    const updated = [...scModules]
+                                    updated[mi] = { ...updated[mi], skills: mod.skills.filter((_, j) => j !== ki) }
+                                    setScModules(updated)
+                                  }} />
+                                </div>
+                              ))}
+                              <button
+                                onClick={() => {
+                                  const updated = [...scModules]
+                                  updated[mi] = { ...updated[mi], skills: [...mod.skills, { name: '', value: 75 }] }
+                                  setScModules(updated)
+                                }}
+                                className="text-brand-pink text-sm hover:underline"
+                              >
+                                + Ajouter une compétence
+                              </button>
+                            </div>
+
+                            {/* Module actions */}
+                            <div className="flex items-center justify-between pt-1">
+                              <button
+                                onClick={() => {
+                                  if (!confirm(`Supprimer le module "${mod.label}" ?`)) return
+                                  const updated = scModules.filter((_, j) => j !== mi)
+                                  setScModules(updated)
+                                  setExpandedMod(null)
+                                }}
+                                className="text-xs text-text-tertiary hover:text-red-400 border border-border hover:border-red-500/30 rounded px-3 py-1.5 transition-colors"
+                              >
+                                Supprimer ce module
+                              </button>
+                              <div className="flex gap-1">
+                                <button
+                                  disabled={mi === 0}
+                                  onClick={() => {
+                                    const updated = [...scModules]
+                                    ;[updated[mi - 1], updated[mi]] = [updated[mi], updated[mi - 1]]
+                                    setScModules(updated)
+                                    setExpandedMod(mi - 1)
+                                  }}
+                                  className="text-text-tertiary hover:text-white disabled:opacity-20 transition-colors text-xs border border-border rounded px-2.5 py-1.5"
+                                >▲</button>
+                                <button
+                                  disabled={mi === scModules.length - 1}
+                                  onClick={() => {
+                                    const updated = [...scModules]
+                                    ;[updated[mi], updated[mi + 1]] = [updated[mi + 1], updated[mi]]
+                                    setScModules(updated)
+                                    setExpandedMod(mi + 1)
+                                  }}
+                                  className="text-text-tertiary hover:text-white disabled:opacity-20 transition-colors text-xs border border-border rounded px-2.5 py-1.5"
+                                >▼</button>
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Add module + Save */}
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={() => {
+                  const updated = [...scModules, { label: 'Nouveau', short: 'NEW', skills: [{ name: '', value: 75 }] }]
+                  setScModules(updated)
+                  setExpandedMod(updated.length - 1)
+                }}
+                className="btn-ghost text-sm"
+              >
+                + Ajouter un module
+              </button>
+              <button
+                onClick={() => {
+                  saveScorecard(scModules)
+                  setCustomSc(true)
+                  flash('Score Card sauvegardée ✓')
+                }}
+                className="btn-primary text-sm"
+              >
+                Sauvegarder la Score Card
+              </button>
             </div>
           </div>
         )}

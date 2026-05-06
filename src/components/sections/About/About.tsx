@@ -11,11 +11,8 @@ const fadeUp = (delay = 0) => ({
 export function About() {
   const headerRef = useRef<HTMLDivElement>(null)
   const block1Ref = useRef<HTMLDivElement>(null)
-  const block3Ref = useRef<HTMLDivElement>(null)
-
   const headerInView = useInView(headerRef, { once: true, margin: '-60px' })
   const block1InView = useInView(block1Ref, { once: true, margin: '-60px' })
-  const block3InView = useInView(block3Ref, { once: true, margin: '-60px' })
 
   return (
     <section id="about" className="py-24">
@@ -68,60 +65,6 @@ export function About() {
           <CareerTimeline />
         </div>
 
-        {/* ── Bloc 3 : En ce moment ── */}
-        <motion.div
-          ref={block3Ref}
-          initial={fadeUp(0.15).initial}
-          animate={block3InView ? fadeUp(0.15).animate : {}}
-          transition={fadeUp(0.15).transition}
-        >
-          <div className="card p-6 border-border-accent bg-[rgba(230,0,76,0.03)]">
-            {/* Header */}
-            <div className="flex items-center gap-3 mb-6">
-              <span className="w-2 h-2 rounded-full bg-brand-pink animate-pulse-pink" />
-              <span className="text-xs font-mono tracking-widest uppercase text-brand-pink">
-                En ce moment
-              </span>
-            </div>
-
-            {/* Two columns */}
-            <div className="grid sm:grid-cols-2 gap-6">
-              {/* Mission principale */}
-              <div>
-                <div className="text-sm font-semibold text-white mb-0.5">
-                  GTM &amp; AI Engineer
-                </div>
-                <div className="text-xs font-mono text-brand-pink mb-3">@ Scalefast</div>
-                <p className="text-sm text-text-secondary leading-relaxed">
-                  Construction de l'infrastructure Sales &amp; Growth — automatisation des
-                  processus, IA multi-agents et prospection scalable pour une agence
-                  outbound SaaS B2B.
-                </p>
-              </div>
-
-              {/* Projets perso */}
-              <div>
-                <div className="text-sm font-semibold text-white mb-3">Projets personnels</div>
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-start gap-3">
-                    <span className="tag-pink shrink-0">AWA</span>
-                    <p className="text-sm text-text-secondary leading-relaxed">
-                      Plateforme d'agents IA pour faciliter l'intégration administrative
-                      des ressortissants étrangers en France.
-                    </p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <span className="tag-pink shrink-0">CoolBot</span>
-                    <p className="text-sm text-text-secondary leading-relaxed">
-                      Assistant IA RAG pour techniciens frigoristes — accès instantané
-                      à la documentation technique sur le terrain.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
 
       </div>
     </section>

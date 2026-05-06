@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { CareerTimeline } from './CareerTimeline'
+import { PlayerCard } from './PlayerCard'
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 20 },
@@ -33,7 +34,7 @@ export function About() {
           </div>
         </motion.div>
 
-        {/* ── Bloc 1 : Qui je suis ── */}
+        {/* ── Bloc 1 : Player Card ── */}
         <motion.div
           ref={block1Ref}
           initial={fadeUp(0.1).initial}
@@ -41,20 +42,7 @@ export function About() {
           transition={fadeUp(0.1).transition}
           className="mb-16"
         >
-          <div className="border-l-2 border-brand-pink pl-6 max-w-2xl">
-            <p className="font-display text-display-sm text-white leading-snug mb-4">
-              "Je construis ce que je rêve d'utiliser."
-            </p>
-            <p className="text-base text-text-secondary leading-relaxed mb-3">
-              Chaque projet part d'un besoin vécu. CoolBot est né d'années sur le terrain
-              comme technicien frigoriste. AWA vient directement de ma communauté.
-              Pas de produit fabriqué — des solutions à des problèmes réels.
-            </p>
-            <p className="text-base text-text-secondary leading-relaxed">
-              Ni purement dev, ni purement commercial. L'interface entre les deux —
-              là où la vraie valeur se crée.
-            </p>
-          </div>
+          <PlayerCard />
         </motion.div>
 
         {/* ── Bloc 2 : Timeline (gère ses propres animations) ── */}

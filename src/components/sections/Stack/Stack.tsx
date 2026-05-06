@@ -18,7 +18,7 @@ export function Stack() {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5 }}
         >
-          <p className="section-eyebrow">03 — Stack</p>
+          <p className="section-eyebrow">02 — Stack</p>
           <div className="flex items-end gap-6 mb-4">
             <h2 className="font-display text-display-lg text-white">Stack</h2>
             <div className="accent-line mb-3" />

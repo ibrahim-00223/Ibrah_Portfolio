@@ -21,7 +21,7 @@ export function Projects() {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5 }}
         >
-          <p className="section-eyebrow">02 — Projets</p>
+          <p className="section-eyebrow">01 — Projets</p>
           <div className="flex items-end gap-6 mb-4">
             <h2 className="font-display text-display-lg text-white">Projets</h2>
             <div className="accent-line mb-3" />

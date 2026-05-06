@@ -28,12 +28,12 @@ const STATUS_OPTIONS: Project['status'][] = ['En cours', 'Complété', 'Concept'
 type ProjectFormData = {
   id: string; name: string; shortDesc: string; fullDesc: string
   status: Project['status']; tagsStr: string; highlightsStr: string
-  links: { label: string; url: string }[]; youtubeId: string
+  links: { label: string; url: string }[]; youtubeId: string; thumbnail: string
 }
 
 const emptyProjectForm = (): ProjectFormData => ({
   id: '', name: '', shortDesc: '', fullDesc: '', status: 'En cours',
-  tagsStr: '', highlightsStr: '', links: [], youtubeId: '',
+  tagsStr: '', highlightsStr: '', links: [], youtubeId: '', thumbnail: '',
 })
 
 const projectToForm = (p: Project): ProjectFormData => ({
@@ -41,6 +41,7 @@ const projectToForm = (p: Project): ProjectFormData => ({
   status: p.status, tagsStr: p.tags.join(', '),
   highlightsStr: p.highlights.join('\n'), links: p.links ? [...p.links] : [],
   youtubeId: p.youtubeId ?? '',
+  thumbnail: p.thumbnail ?? '',
 })
 
 // Accepte un lien complet ou un ID brut
@@ -67,6 +68,7 @@ const formToProject = (f: ProjectFormData, index: number): Project => {
   }
   const ytId = extractYouTubeId(f.youtubeId)
   if (ytId) obj.youtubeId = ytId
+  if (f.thumbnail.trim()) obj.thumbnail = f.thumbnail.trim()
   if (f.links?.length) obj.links = f.links.filter(l => l.label || l.url)
   return obj
 }
@@ -393,6 +395,14 @@ export function AdminPage() {
                         </select>
                       </Field>
                       <Field label="Vidéo (YouTube ou fichier direct)"><input value={projForm.youtubeId} onChange={e => setProjForm(f => ({...f, youtubeId: e.target.value}))} className="admin-input" placeholder="https://youtu.be/...  ·  /videos/demo.mp4  ·  https://cdn.../demo.webm" /></Field>
+                      <Field label="Miniature (URL image)" className="md:col-span-2">
+                        <input value={projForm.thumbnail} onChange={e => setProjForm(f => ({...f, thumbnail: e.target.value}))} className="admin-input" placeholder="https://... (laisser vide pour placeholder auto)" />
+                        {projForm.thumbnail && (
+                          <div className="mt-2 w-32 rounded-lg overflow-hidden border border-border" style={{ aspectRatio: '16/9' }}>
+                            <img src={projForm.thumbnail} alt="Aperçu" className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                          </div>
+                        )}
+                      </Field>
                       <Field label="Description courte *" className="md:col-span-2"><input value={projForm.shortDesc} onChange={e => setProjForm(f => ({...f, shortDesc: e.target.value}))} className="admin-input" placeholder="Une phrase résumant le projet" /></Field>
                       <Field label="Description complète *" className="md:col-span-2"><textarea value={projForm.fullDesc} onChange={e => setProjForm(f => ({...f, fullDesc: e.target.value}))} rows={4} className="admin-input resize-y" /></Field>
                       <Field label="Technologies (virgules)" className="md:col-span-2"><input value={projForm.tagsStr} onChange={e => setProjForm(f => ({...f, tagsStr: e.target.value}))} className="admin-input" placeholder="Python, FastAPI, RAG" /></Field>

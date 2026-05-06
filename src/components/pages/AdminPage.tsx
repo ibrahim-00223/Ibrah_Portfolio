@@ -395,10 +395,23 @@ export function AdminPage() {
                         </select>
                       </Field>
                       <Field label="Vidéo (YouTube ou fichier direct)"><input value={projForm.youtubeId} onChange={e => setProjForm(f => ({...f, youtubeId: e.target.value}))} className="admin-input" placeholder="https://youtu.be/...  ·  /videos/demo.mp4  ·  https://cdn.../demo.webm" /></Field>
-                      <Field label="Miniature (URL image)" className="md:col-span-2">
-                        <input value={projForm.thumbnail} onChange={e => setProjForm(f => ({...f, thumbnail: e.target.value}))} className="admin-input" placeholder="https://... (laisser vide pour placeholder auto)" />
+                      <Field label="Miniature (image ou URL)" className="md:col-span-2">
+                        <div className="flex gap-2">
+                          <input value={projForm.thumbnail} onChange={e => setProjForm(f => ({...f, thumbnail: e.target.value}))} className="admin-input flex-1" placeholder="https://... (ou upload ci-contre)" />
+                          <label className="btn-ghost text-sm cursor-pointer shrink-0 flex items-center gap-1.5">
+                            ↑ Upload
+                            <input type="file" accept="image/*" className="hidden" onChange={e => {
+                              const file = e.target.files?.[0]
+                              if (!file) return
+                              const reader = new FileReader()
+                              reader.onload = ev => setProjForm(f => ({...f, thumbnail: ev.target?.result as string}))
+                              reader.readAsDataURL(file)
+                              e.target.value = ''
+                            }} />
+                          </label>
+                        </div>
                         {projForm.thumbnail && (
-                          <div className="mt-2 w-32 rounded-lg overflow-hidden border border-border" style={{ aspectRatio: '16/9' }}>
+                          <div className="mt-2 w-40 rounded-lg overflow-hidden border border-border" style={{ aspectRatio: '16/9' }}>
                             <img src={projForm.thumbnail} alt="Aperçu" className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
                           </div>
                         )}

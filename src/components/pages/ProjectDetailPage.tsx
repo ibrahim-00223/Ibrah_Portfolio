@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import clsx from 'clsx'
@@ -21,6 +22,7 @@ const item = {
 }
 
 export function ProjectDetailPage() {
+  useEffect(() => { window.scrollTo(0, 0) }, [])
   const projects = getProjects()
   const { id } = useParams<{ id: string }>()
   const project = projects.find((p) => p.id === id)

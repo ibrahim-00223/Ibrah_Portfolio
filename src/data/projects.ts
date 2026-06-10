@@ -64,4 +64,38 @@ export const projects: Project[] = [
       'Construit à partir d\'un vécu terrain en tant que technicien frigoriste',
     ],
   },
+  {
+    id: 'content-engine',
+    number: '04',
+    name: 'Content Engine',
+    shortDesc: 'Système d\'automatisation de contenu SEO/GEO pour YouTube et le web',
+    fullDesc:
+      'Système qui automatise la recherche de mots-clés, la génération de briefs éditoriaux et l\'optimisation SEO/GEO des contenus. Combine l\'analyse des tendances YouTube (via l\'API), la data GSC/Semrush et des agents IA pour produire des stratégies de contenu data-driven. Conçu pour scaler la production de contenu sans sacrifier la qualité.',
+    status: 'Concept',
+    tags: ['Python', 'LLM', 'SEO/GEO', 'YouTube API', 'GSC', 'Semrush'],
+    highlights: [
+      'Recherche automatisée de mots-clés et opportunités de contenu',
+      'Génération de briefs éditoriaux par IA avec contraintes SEO',
+      'Pipeline d\'analyse GSC + Semrush pour prioriser les sujets',
+      'Dashboards de performance par chaîne et par format',
+      'Architecture modulaire permettant d\'ajouter de nouvelles plateformes',
+    ],
+  },
+  {
+    id: 'linkedin-automation',
+    number: '05',
+    name: 'LinkedIn Automation',
+    shortDesc: 'Pipeline d\'automatisation outbound LinkedIn pour la prospection B2B SaaS',
+    fullDesc:
+      'Système d\'automatisation de la prospection LinkedIn combinant enrichment de données, scoring de prospects et séquences de messages personnalisés. Construit autour de l\'API LinkedIn, d\'Airtable pour le CRM et de n8n pour l\'orchestration des workflows. Permet de qualifier et d\'engager des prospects à l\'échelle tout en maintenant une approche personnalisée.',
+    status: 'Concept',
+    tags: ['LinkedIn API', 'n8n', 'Airtable', 'Python', 'Enrichissement data', 'CRM'],
+    highlights: [
+      'Enrichissement automatique des profils LinkedIn (poste, secteur, signaux)',
+      'Scoring intelligent des prospects basé sur des critères métier',
+      'Séquences de messages personnalisées avec templates dynamiques',
+      'Dashboard de suivi des taux de réponse et conversion',
+      'Intégration CRM bidirectionnelle (Airtable ↔ LinkedIn)',
+    ],
+  },
 ]

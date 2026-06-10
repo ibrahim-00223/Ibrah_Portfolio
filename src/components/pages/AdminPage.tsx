@@ -19,7 +19,7 @@ import type { StackNode } from '../../data/stack'
 import { groupLabels } from '../../data/stack'
 
 // ── Mot de passe — modifier ici ──────────────────────────────────────────────
-const ADMIN_PASSWORD = 'Ibrahim2025'
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'Ibrahim2025'
 const SESSION_KEY    = 'portfolio_admin_auth'
 
 type Tab = 'projets' | 'experiences' | 'stack' | 'statut' | 'scorecard' | 'academique'

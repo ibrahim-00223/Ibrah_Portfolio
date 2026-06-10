@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { getStatus } from '../../../data/statusStore'
+import { getScorecard, moduleValue } from '../../../data/scorecardStore'
 
-const SKILLS = [
-  { label: 'Business',           value: 88 },
-  { label: 'IA',                 value: 82 },
-  { label: 'Data',               value: 74 },
-  { label: 'Engineering',        value: 70 },
-  { label: 'Project Management', value: 78 },
-]
+const SCORECARD = getScorecard()
+
+const SKILLS = SCORECARD.map((m) => ({
+  label: m.label,
+  value: moduleValue(m),
+}))
 
 function SkillBar({ label, value, delay }: { label: string; value: number; delay: number }) {
   const ref = useRef(null)

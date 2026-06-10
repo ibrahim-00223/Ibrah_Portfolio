@@ -22,10 +22,16 @@ const item = {
 }
 
 export function ProjectDetailPage() {
-  useEffect(() => { window.scrollTo(0, 0) }, [])
   const projects = getProjects()
   const { id } = useParams<{ id: string }>()
   const project = projects.find((p) => p.id === id)
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+    if (project) {
+      document.title = `${project.name} — Ibrahim CISSE`
+    }
+  }, [project])
 
   if (!project) {
     return (

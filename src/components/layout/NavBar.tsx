@@ -52,6 +52,7 @@ export function NavBar() {
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           className="font-display font-bold text-lg text-white hover:text-brand-pink transition-colors"
+          aria-label="Retour en haut de page"
         >
           IC.
         </button>
@@ -70,6 +71,7 @@ export function NavBar() {
                     ? 'text-white font-medium'
                     : 'text-text-secondary hover:text-white'
                 )}
+                aria-label={`Aller à la section ${label}`}
               >
                 {label}
                 {isActive && (
@@ -81,6 +83,7 @@ export function NavBar() {
           <button
             onClick={() => setContactOpen(true)}
             className="ml-3 btn-primary text-xs py-2 px-4"
+            aria-label="Ouvrir les liens de contact"
           >
             Me contacter
           </button>
@@ -90,7 +93,8 @@ export function NavBar() {
         <button
           className="md:hidden flex flex-col gap-1.5 p-2"
           onClick={() => setMenuOpen((v) => !v)}
-          aria-label="Menu"
+          aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+          aria-expanded={menuOpen}
         >
           <span className={clsx('block w-5 h-0.5 bg-white transition-all duration-200', menuOpen && 'rotate-45 translate-y-2')} />
           <span className={clsx('block w-5 h-0.5 bg-white transition-all duration-200', menuOpen && 'opacity-0')} />
@@ -113,6 +117,7 @@ export function NavBar() {
           <button
             onClick={() => { setContactOpen(true); setMenuOpen(false) }}
             className="mt-2 btn-primary justify-center"
+            aria-label="Ouvrir les liens de contact"
           >
             Me contacter
           </button>

@@ -1,27 +1,18 @@
-const KEY = 'portfolio_status'
-
 export type StatusData = {
   label: string
   available: boolean
 }
 
-const DEFAULT: StatusData = {
-  label: 'Disponible · Paris',
-  available: true,
-}
+import {
+  getStatusRaw, saveStatus, resetKey,
+} from './api'
 
 export function getStatus(): StatusData {
-  try {
-    const raw = localStorage.getItem(KEY)
-    if (raw) return { ...DEFAULT, ...JSON.parse(raw) }
-  } catch {}
-  return DEFAULT
+  return getStatusRaw()
 }
 
-export function saveStatus(data: StatusData): void {
-  localStorage.setItem(KEY, JSON.stringify(data))
-}
+export { saveStatus }
 
 export function resetStatus(): void {
-  localStorage.removeItem(KEY)
+  resetKey('status')
 }

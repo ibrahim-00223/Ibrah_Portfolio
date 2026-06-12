@@ -319,7 +319,7 @@ export async function initDataStore(): Promise<void> {
   ensureCache()
   const serverData = await fetchServerData()
   if (serverData) {
-    cache = serverData
+    cache = { ...DEFAULT_DATA, ...serverData }
   }
 }
 

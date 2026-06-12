@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import clsx from 'clsx'
@@ -182,6 +182,8 @@ export function AdminPage() {
 
   // ── SCORECARD state ────────────────────────────────────────────────────────
   const [scModules, setScModules]     = useState<StatModule[]>(() => getScorecard())
+  const scModulesRef                  = useRef(scModules)
+  useEffect(() => { scModulesRef.current = scModules }, [scModules])
   const [customSc, setCustomSc]       = useState(() => isUsingCustomScorecard())
   const [expandedMod, setExpandedMod] = useState<number | null>(null)
 
@@ -853,7 +855,7 @@ export function AdminPage() {
                                 <input
                                   value={mod.label}
                                   onChange={e => {
-                                    const updated = [...scModules]
+                                    const updated = [...scModulesRef.current]
                                     updated[mi] = { ...updated[mi], label: e.target.value }
                                     setScModules(updated)
                                   }}
@@ -865,7 +867,7 @@ export function AdminPage() {
                                 <input
                                   value={mod.short}
                                   onChange={e => {
-                                    const updated = [...scModules]
+                                    const updated = [...scModulesRef.current]
                                     updated[mi] = { ...updated[mi], short: e.target.value }
                                     setScModules(updated)
                                   }}
@@ -888,7 +890,7 @@ export function AdminPage() {
                                   <input
                                     value={sk.name}
                                     onChange={e => {
-                                      const updated = [...scModules]
+                                      const updated = [...scModulesRef.current]
                                       const skills = [...updated[mi].skills]
                                       skills[ki] = { ...skills[ki], name: e.target.value }
                                       updated[mi] = { ...updated[mi], skills }
@@ -901,7 +903,7 @@ export function AdminPage() {
                                     <input
                                       type="range" min={1} max={99} value={sk.value}
                                       onChange={e => {
-                                        const updated = [...scModules]
+                                        const updated = [...scModulesRef.current]
                                         const skills = [...updated[mi].skills]
                                         skills[ki] = { ...skills[ki], value: +e.target.value }
                                         updated[mi] = { ...updated[mi], skills }
@@ -912,16 +914,16 @@ export function AdminPage() {
                                     <span className="text-white font-mono font-bold text-sm w-8 text-right">{sk.value}</span>
                                   </div>
                                   <RemoveBtn onClick={() => {
-                                    const updated = [...scModules]
-                                    updated[mi] = { ...updated[mi], skills: mod.skills.filter((_, j) => j !== ki) }
+                                    const updated = [...scModulesRef.current]
+                                    updated[mi] = { ...updated[mi], skills: updated[mi].skills.filter((_, j) => j !== ki) }
                                     setScModules(updated)
                                   }} />
                                 </div>
                               ))}
                               <button
                                 onClick={() => {
-                                  const updated = [...scModules]
-                                  updated[mi] = { ...updated[mi], skills: [...mod.skills, { name: '', value: 75 }] }
+                                  const updated = [...scModulesRef.current]
+                                  updated[mi] = { ...updated[mi], skills: [...updated[mi].skills, { name: '', value: 75 }] }
                                   setScModules(updated)
                                 }}
                                 className="text-brand-pink text-sm hover:underline"
@@ -935,7 +937,7 @@ export function AdminPage() {
                               <button
                                 onClick={() => {
                                   if (!confirm(`Supprimer le module "${mod.label}" ?`)) return
-                                  const updated = scModules.filter((_, j) => j !== mi)
+                                  const updated = scModulesRef.current.filter((_, j) => j !== mi)
                                   setScModules(updated)
                                   setExpandedMod(null)
                                 }}
@@ -946,22 +948,22 @@ export function AdminPage() {
                               <div className="flex gap-1">
                                 <button
                                   disabled={mi === 0}
-                                  onClick={() => {
-                                    const updated = [...scModules]
-                                    ;[updated[mi - 1], updated[mi]] = [updated[mi], updated[mi - 1]]
-                                    setScModules(updated)
-                                    setExpandedMod(mi - 1)
-                                  }}
+                                onClick={() => {
+                                  const updated = [...scModulesRef.current]
+                                  ;[updated[mi - 1], updated[mi]] = [updated[mi], updated[mi - 1]]
+                                  setScModules(updated)
+                                  setExpandedMod(mi - 1)
+                                }}
                                   className="text-text-tertiary hover:text-white disabled:opacity-20 transition-colors text-xs border border-border rounded px-2.5 py-1.5"
                                 >▲</button>
                                 <button
-                                  disabled={mi === scModules.length - 1}
-                                  onClick={() => {
-                                    const updated = [...scModules]
-                                    ;[updated[mi], updated[mi + 1]] = [updated[mi + 1], updated[mi]]
-                                    setScModules(updated)
-                                    setExpandedMod(mi + 1)
-                                  }}
+                                disabled={mi === scModulesRef.current.length - 1}
+                                onClick={() => {
+                                  const updated = [...scModulesRef.current]
+                                  ;[updated[mi], updated[mi + 1]] = [updated[mi + 1], updated[mi]]
+                                  setScModules(updated)
+                                  setExpandedMod(mi + 1)
+                                }}
                                   className="text-text-tertiary hover:text-white disabled:opacity-20 transition-colors text-xs border border-border rounded px-2.5 py-1.5"
                                 >▼</button>
                               </div>
@@ -979,7 +981,7 @@ export function AdminPage() {
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={() => {
-                  const updated = [...scModules, { label: 'Nouveau', short: 'NEW', skills: [{ name: '', value: 75 }] }]
+                  const updated = [...scModulesRef.current, { label: 'Nouveau', short: 'NEW', skills: [{ name: '', value: 75 }] }]
                   setScModules(updated)
                   setExpandedMod(updated.length - 1)
                 }}
@@ -989,7 +991,7 @@ export function AdminPage() {
               </button>
               <button
                 onClick={() => {
-                  saveScorecard(scModules)
+                  saveScorecard(scModulesRef.current)
                   setCustomSc(true)
                   flash('Score Card sauvegardée ✓')
                 }}

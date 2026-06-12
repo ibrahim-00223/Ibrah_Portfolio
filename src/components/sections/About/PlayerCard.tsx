@@ -4,11 +4,6 @@ import { ParcourModal } from './ParcourModal'
 import { getScorecard, moduleValue } from '../../../data/scorecardStore'
 import { getContact } from '../../../data/contactStore'
 
-const RAW = getScorecard()
-const CONTACT = getContact()
-const STATS = RAW.map(m => ({ ...m, value: moduleValue(m) }))
-const OVERALL = Math.round(STATS.reduce((s, x) => s + x.value, 0) / STATS.length)
-
 function skillColor(v: number) {
   if (v >= 85) return '#4ade80'
   if (v >= 75) return '#E6004C'
@@ -17,11 +12,11 @@ function skillColor(v: number) {
 }
 
 // ── Pentagon radar ─────────────────────────────────────────────────────────────
-function RadarChart({ animated }: { animated: boolean }) {
+function RadarChart({ stats, animated }: { stats: { short: string; value: number }[]; animated: boolean }) {
   const S = 160, C = S / 2, R = 58
-  const angles = STATS.map((_, i) => (Math.PI * 2 * i) / STATS.length - Math.PI / 2)
+  const angles = stats.map((_, i) => (Math.PI * 2 * i) / stats.length - Math.PI / 2)
   const outer  = angles.map(a => ({ x: C + R * Math.cos(a), y: C + R * Math.sin(a) }))
-  const data   = STATS.map((s, i) => ({
+  const data   = stats.map((s, i) => ({
     x: C + R * (s.value / 100) * Math.cos(angles[i]),
     y: C + R * (s.value / 100) * Math.sin(angles[i]),
   }))
@@ -48,7 +43,7 @@ function RadarChart({ animated }: { animated: boolean }) {
           initial={{ opacity: 0 }} animate={animated ? { opacity: 1 } : { opacity: 0 }}
           transition={{ delay: 0.5 + i * 0.07 }} />
       ))}
-      {STATS.map((s, i) => {
+      {stats.map((s, i) => {
         const lx = C + (R + 13) * Math.cos(angles[i])
         const ly = C + (R + 13) * Math.sin(angles[i])
         return (
@@ -118,6 +113,10 @@ export function PlayerCard() {
   const [parcourOpen, setParcourOpen] = useState(false)
   const [openModule, setOpenModule]   = useState<number | null>(null)
 
+  const contact = getContact()
+  const stats = getScorecard().map(m => ({ ...m, value: moduleValue(m) }))
+  const overall = Math.round(stats.reduce((s, x) => s + x.value, 0) / stats.length)
+
   const BIG_R = 44, BIG_C = 2 * Math.PI * BIG_R
 
   return (
@@ -139,7 +138,7 @@ export function PlayerCard() {
           {/* 1 — Identity */}
           <div className="flex flex-col items-center justify-center gap-3 p-7">
             <div className="w-24 h-24 rounded-xl overflow-hidden ring-2 ring-brand-pink/40">
-              <img src={CONTACT.photoUrl} alt="Ibrahim CISSE" className="w-full h-full object-cover object-top" />
+              <img src={contact.photoUrl} alt="Ibrahim CISSE" className="w-full h-full object-cover object-top" />
             </div>
             <div className="text-center">
               <p className="font-display font-bold text-white text-base leading-tight">Ibrahim CISSE</p>
@@ -157,14 +156,14 @@ export function PlayerCard() {
                   cx="50" cy="50" r={BIG_R} fill="none" stroke="#E6004C" strokeWidth="6" strokeLinecap="round"
                   strokeDasharray={BIG_C}
                   initial={{ strokeDashoffset: BIG_C }}
-                  animate={inView ? { strokeDashoffset: BIG_C * (1 - OVERALL / 100) } : {}}
+                  animate={inView ? { strokeDashoffset: BIG_C * (1 - overall / 100) } : {}}
                   transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
                   style={{ transform: 'rotate(-90deg)', transformOrigin: '50px 50px' }}
                 />
               </svg>
               <div className="relative flex flex-col items-center z-10">
                 <span className="text-white/40 text-[10px] font-mono tracking-widest leading-none">GTM</span>
-                <span className="font-display font-bold text-white leading-none mt-0.5" style={{ fontSize: 36 }}>{OVERALL}</span>
+                <span className="font-display font-bold text-white leading-none mt-0.5" style={{ fontSize: 36 }}>{overall}</span>
               </div>
             </div>
           </div>
@@ -173,14 +172,14 @@ export function PlayerCard() {
           <div className="flex flex-col items-center justify-center p-7 gap-3">
             <span className="text-xs font-mono tracking-[0.12em] text-white/50 uppercase font-semibold">Radar</span>
             <div className="w-full max-w-[190px] aspect-square">
-              <RadarChart animated={inView} />
+              <RadarChart stats={stats} animated={inView} />
             </div>
           </div>
 
           {/* 4 — Module averages */}
           <div className="flex flex-col justify-center p-7 gap-3">
             <span className="text-xs font-mono tracking-[0.12em] text-white/50 uppercase font-semibold mb-1">Stats</span>
-            {STATS.map((s, i) => (
+            {stats.map((s, i) => (
               <div key={s.short} className="flex items-center gap-2.5">
                 <span className="text-white/60 text-xs font-mono font-semibold w-9 shrink-0">{s.short}</span>
                 <div className="flex-1 h-1 rounded-full bg-white/10 overflow-hidden">
@@ -204,7 +203,7 @@ export function PlayerCard() {
         {/* ══ BOTTOM SECTION — one circle per module, click to reveal skills ══ */}
         <div className="overflow-x-auto">
           <div className="grid grid-cols-5 divide-x divide-white/5" style={{ minWidth: 480 }}>
-            {STATS.map((s, si) => (
+            {stats.map((s, si) => (
               <button
                 key={s.label}
                 onClick={() => setOpenModule(si)}
@@ -239,7 +238,7 @@ export function PlayerCard() {
       {/* ══ MODULE SKILLS POPUP ══ */}
       <AnimatePresence>
         {openModule !== null && (() => {
-          const mod = STATS[openModule]
+          const mod = stats[openModule]
           return (
             <>
               <motion.div

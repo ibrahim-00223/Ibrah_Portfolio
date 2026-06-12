@@ -4,14 +4,6 @@ import { getStatus } from '../../../data/statusStore'
 import { getScorecard, moduleValue } from '../../../data/scorecardStore'
 import { getContact } from '../../../data/contactStore'
 
-const SCORECARD = getScorecard()
-const CONTACT = getContact()
-
-const SKILLS = SCORECARD.map((m) => ({
-  label: m.label,
-  value: moduleValue(m),
-}))
-
 function SkillBar({ label, value, delay }: { label: string; value: number; delay: number }) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true })
@@ -39,6 +31,12 @@ export function HeroFlipCard() {
   const [flipped, setFlipped] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const status = getStatus()
+
+  const contact = getContact()
+  const skills = getScorecard().map((m) => ({
+    label: m.label,
+    value: moduleValue(m),
+  }))
 
   const resetTimer = () => {
     if (timerRef.current) clearInterval(timerRef.current)
@@ -95,7 +93,7 @@ export function HeroFlipCard() {
               <div className="absolute -bottom-1.5 -right-1.5 w-full h-full rounded-2xl border border-brand-pink opacity-10 pointer-events-none" />
 
               <img
-                src={CONTACT.photoUrl}
+                src={contact.photoUrl}
                 alt="Ibrahim CISSE"
                 className="w-full h-full object-cover object-top rounded-2xl"
                 style={{ boxShadow: '0 24px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06)' }}
@@ -129,7 +127,7 @@ export function HeroFlipCard() {
 
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 ring-2 ring-brand-pink/60">
-                  <img src={CONTACT.photoUrl} alt="Ibrahim CISSE" className="w-full h-full object-cover object-top" />
+                  <img src={contact.photoUrl} alt="Ibrahim CISSE" className="w-full h-full object-cover object-top" />
                 </div>
                 <div className="min-w-0">
                   <p className="font-display font-bold text-white text-sm leading-tight">Ibrahim CISSE</p>
@@ -146,7 +144,7 @@ export function HeroFlipCard() {
               </div>
 
               <div className="flex flex-col gap-3 flex-1 justify-center">
-                {SKILLS.map(({ label, value }, i) => (
+                {skills.map(({ label, value }, i) => (
                   <SkillBar key={label} label={label} value={value} delay={0.1 + i * 0.08} />
                 ))}
               </div>

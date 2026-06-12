@@ -289,6 +289,7 @@ const DEFAULT_DATA: PortfolioData = {
   contact: {
     name: 'Ibrahim CISSE',
     role: 'GTM Engineer · AI Builder · Content Creator',
+    photoUrl: './ibrahim.png',
     links: [
       { label: 'LinkedIn', sub: 'ibrahim-cissé', href: 'https://www.linkedin.com/in/ibrahim-ciss%C3%A9-6981b8240/', icon: 'linkedin' },
       { label: 'Réserver un call', sub: 'Notion Calendar', href: 'https://calendar.notion.so/meet/ibrahimcisse1/044on4pg6', icon: 'calendar' },

@@ -8,6 +8,7 @@ export type ContactLink = {
 export type ContactData = {
   name: string
   role: string
+  photoUrl: string
   links: ContactLink[]
 }
 

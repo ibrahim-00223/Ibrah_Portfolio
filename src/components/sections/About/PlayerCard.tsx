@@ -2,8 +2,10 @@ import { useState, useRef } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { ParcourModal } from './ParcourModal'
 import { getScorecard, moduleValue } from '../../../data/scorecardStore'
+import { getContact } from '../../../data/contactStore'
 
 const RAW = getScorecard()
+const CONTACT = getContact()
 const STATS = RAW.map(m => ({ ...m, value: moduleValue(m) }))
 const OVERALL = Math.round(STATS.reduce((s, x) => s + x.value, 0) / STATS.length)
 
@@ -137,7 +139,7 @@ export function PlayerCard() {
           {/* 1 — Identity */}
           <div className="flex flex-col items-center justify-center gap-3 p-7">
             <div className="w-24 h-24 rounded-xl overflow-hidden ring-2 ring-brand-pink/40">
-              <img src="./ibrahim.png" alt="Ibrahim CISSE" className="w-full h-full object-cover object-top" />
+              <img src={CONTACT.photoUrl} alt="Ibrahim CISSE" className="w-full h-full object-cover object-top" />
             </div>
             <div className="text-center">
               <p className="font-display font-bold text-white text-base leading-tight">Ibrahim CISSE</p>

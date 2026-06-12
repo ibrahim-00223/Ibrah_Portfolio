@@ -342,6 +342,7 @@ export function AdminPage() {
     const data: ContactData = {
       name: linkForm.name.trim() || 'Ibrahim CISSE',
       role: linkForm.role.trim() || 'GTM Engineer · AI Builder · Content Creator',
+      photoUrl: contactData.photoUrl || './ibrahim.png',
       links: editingLink === null || editingLink < 0
         ? [...contactData.links, { label: linkForm.label.trim(), sub: linkForm.sub.trim(), href: linkForm.href.trim(), icon: linkForm.icon }]
         : contactData.links.map((l, i) => i === editingLink
@@ -362,7 +363,7 @@ export function AdminPage() {
     persistContactFn({ ...contactData, links })
   }
   const handleContactNameRoleSave = () => {
-    persistContactFn({ ...contactData, name: contactData.name.trim() || 'Ibrahim CISSE', role: contactData.role.trim() || 'GTM Engineer · AI Builder · Content Creator' })
+    persistContactFn({ ...contactData, name: contactData.name.trim() || 'Ibrahim CISSE', role: contactData.role.trim() || 'GTM Engineer · AI Builder · Content Creator', photoUrl: contactData.photoUrl || './ibrahim.png' })
   }
 
   // ════════════════════════════════════════════════════════════════════════════
@@ -1088,6 +1089,34 @@ export function AdminPage() {
                     className="admin-input"
                     placeholder="GTM Engineer · AI Builder · Content Creator"
                   />
+                </Field>
+              </div>
+              <div className="grid grid-cols-1 gap-4">
+                <Field label="Photo de profil (URL ou upload)">
+                  <div className="flex gap-2">
+                    <input
+                      value={contactData.photoUrl}
+                      onChange={e => setContactData(d => ({ ...d, photoUrl: e.target.value }))}
+                      className="admin-input flex-1"
+                      placeholder="./ibrahim.png ou data:image/..."
+                    />
+                    <label className="btn-ghost text-sm cursor-pointer shrink-0 flex items-center gap-1.5">
+                      ↑ Upload
+                      <input type="file" accept="image/*" className="hidden" onChange={e => {
+                        const file = e.target.files?.[0]
+                        if (!file) return
+                        const reader = new FileReader()
+                        reader.onload = ev => setContactData(d => ({ ...d, photoUrl: ev.target?.result as string }))
+                        reader.readAsDataURL(file)
+                        e.target.value = ''
+                      }} />
+                    </label>
+                  </div>
+                  {contactData.photoUrl && (
+                    <div className="mt-2 w-20 h-20 rounded-xl overflow-hidden border border-border">
+                      <img src={contactData.photoUrl} alt="Aperçu" className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                    </div>
+                  )}
                 </Field>
               </div>
               <button onClick={handleContactNameRoleSave} className="btn-primary text-sm">

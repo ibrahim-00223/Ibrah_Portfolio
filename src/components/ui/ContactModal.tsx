@@ -120,7 +120,7 @@ export function ContactModal({ isOpen, onClose }: Props) {
             <div className="flex flex-col items-center gap-3">
               <div className="w-20 h-20 rounded-full ring-2 ring-brand-pink ring-offset-2 ring-offset-[#111111] overflow-hidden">
                 <img
-                  src="./ibrahim.png"
+                  src={contact.photoUrl || './ibrahim.png'}
                   alt={contact.name}
                   className="w-full h-full object-cover object-top"
                 />

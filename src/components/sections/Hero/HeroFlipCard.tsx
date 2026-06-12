@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { getStatus } from '../../../data/statusStore'
 import { getScorecard, moduleValue } from '../../../data/scorecardStore'
+import { getContact } from '../../../data/contactStore'
 
 const SCORECARD = getScorecard()
+const CONTACT = getContact()
 
 const SKILLS = SCORECARD.map((m) => ({
   label: m.label,
@@ -93,7 +95,7 @@ export function HeroFlipCard() {
               <div className="absolute -bottom-1.5 -right-1.5 w-full h-full rounded-2xl border border-brand-pink opacity-10 pointer-events-none" />
 
               <img
-                src="./ibrahim.png"
+                src={CONTACT.photoUrl}
                 alt="Ibrahim CISSE"
                 className="w-full h-full object-cover object-top rounded-2xl"
                 style={{ boxShadow: '0 24px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06)' }}
@@ -127,7 +129,7 @@ export function HeroFlipCard() {
 
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 ring-2 ring-brand-pink/60">
-                  <img src="./ibrahim.png" alt="Ibrahim CISSE" className="w-full h-full object-cover object-top" />
+                  <img src={CONTACT.photoUrl} alt="Ibrahim CISSE" className="w-full h-full object-cover object-top" />
                 </div>
                 <div className="min-w-0">
                   <p className="font-display font-bold text-white text-sm leading-tight">Ibrahim CISSE</p>

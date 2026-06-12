@@ -86,7 +86,7 @@ export function ProjectDetailPage() {
           {/* Description */}
           <motion.div variants={item} className="space-y-3">
             <h2 className="text-sm font-semibold text-text-tertiary tracking-widest uppercase">Description</h2>
-            <p className="text-text-secondary leading-relaxed">{project.fullDesc}</p>
+            <p className="text-text-secondary leading-relaxed whitespace-pre-line">{project.fullDesc}</p>
           </motion.div>
 
           {/* Highlights */}

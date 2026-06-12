@@ -4,8 +4,9 @@ import type { TimelinePhase } from './timeline'
 import type { AcademicEntry } from './academicStore'
 import type { StatModule } from './scorecardStore'
 import type { StatusData } from './statusStore'
+import type { ContactData } from './contactStore'
 
-export type { Project, StackNode, TimelinePhase, AcademicEntry, StatModule, StatusData }
+export type { Project, StackNode, TimelinePhase, AcademicEntry, StatModule, StatusData, ContactData }
 
 export type PortfolioData = {
   projects: Project[]
@@ -14,6 +15,7 @@ export type PortfolioData = {
   academic: AcademicEntry[]
   scorecard: StatModule[]
   status: StatusData
+  contact: ContactData
 }
 
 export type PortfolioKey = keyof PortfolioData
@@ -25,6 +27,7 @@ const STORAGE_KEYS: Record<PortfolioKey, string> = {
   academic:   'portfolio_academic',
   scorecard:  'portfolio_scorecard',
   status:     'portfolio_status',
+  contact:    'portfolio_contact',
 }
 
 const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || ''
@@ -283,6 +286,16 @@ const DEFAULT_DATA: PortfolioData = {
     },
   ],
   status: { label: 'Disponible · Paris', available: true },
+  contact: {
+    name: 'Ibrahim CISSE',
+    role: 'GTM Engineer · AI Builder · Content Creator',
+    links: [
+      { label: 'LinkedIn', sub: 'ibrahim-cissé', href: 'https://www.linkedin.com/in/ibrahim-ciss%C3%A9-6981b8240/', icon: 'linkedin' },
+      { label: 'Réserver un call', sub: 'Notion Calendar', href: 'https://calendar.notion.so/meet/ibrahimcisse1/044on4pg6', icon: 'calendar' },
+      { label: 'GitHub', sub: 'ibrahim-00223', href: 'https://github.com/ibrahim-00223', icon: 'github' },
+      { label: 'YouTube', sub: '@by_ibrah07', href: 'https://youtube.com/@by_ibrah07', icon: 'youtube' },
+    ],
+  },
 }
 
 // ── Init / Cache ───────────────────────────────────────────────────────────────
@@ -296,6 +309,7 @@ function ensureCache(): PortfolioData {
       academic:   (loadFromLocalStorage('academic')   as AcademicEntry[]) ?? DEFAULT_DATA.academic,
       scorecard:  (loadFromLocalStorage('scorecard')  as StatModule[])    ?? DEFAULT_DATA.scorecard,
       status:     (loadFromLocalStorage('status')     as StatusData)      ?? DEFAULT_DATA.status,
+      contact:    (loadFromLocalStorage('contact')    as ContactData)     ?? DEFAULT_DATA.contact,
     }
   }
   return cache
@@ -317,6 +331,7 @@ export function getTimelineRaw(): TimelinePhase[] { return ensureCache().timelin
 export function getAcademicRaw(): AcademicEntry[] { return ensureCache().academic }
 export function getScorecardRaw(): StatModule[]   { return ensureCache().scorecard }
 export function getStatusRaw(): StatusData        { return ensureCache().status }
+export function getContactRaw(): ContactData       { return ensureCache().contact }
 
 // ── Async savers (localStorage + server) ───────────────────────────────────────
 
@@ -343,6 +358,9 @@ export async function saveScorecard(data: StatModule[]) {
 export async function saveStatus(data: StatusData) {
   ensureCache().status = data; await saveKey('status', data)
 }
+export async function saveContact(data: ContactData) {
+  ensureCache().contact = data; await saveKey('contact', data)
+}
 
 // ── Reset (clear localStorage, keep cache as-is) ─────────────────────────────
 
@@ -364,6 +382,7 @@ export function hasLocalOverrides(): boolean {
     || STORAGE_KEYS.academic in localStorage
     || STORAGE_KEYS.scorecard in localStorage
     || STORAGE_KEYS.status in localStorage
+    || STORAGE_KEYS.contact in localStorage
 }
 
 export function getLocalDataForMigration(): PortfolioData {
@@ -374,5 +393,6 @@ export function getLocalDataForMigration(): PortfolioData {
     academic:   loadFromLocalStorage('academic')   as AcademicEntry[] ?? DEFAULT_DATA.academic,
     scorecard:  loadFromLocalStorage('scorecard')  as StatModule[]    ?? DEFAULT_DATA.scorecard,
     status:     loadFromLocalStorage('status')     as StatusData      ?? DEFAULT_DATA.status,
+    contact:    loadFromLocalStorage('contact')    as ContactData     ?? DEFAULT_DATA.contact,
   }
 }

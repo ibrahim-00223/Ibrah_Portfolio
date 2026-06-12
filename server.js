@@ -207,6 +207,17 @@ const DEFAULT_DATA = {
   ],
 
   status: { label: 'Disponible · Paris', available: true },
+
+  contact: {
+    name: 'Ibrahim CISSE',
+    role: 'GTM Engineer · AI Builder · Content Creator',
+    links: [
+      { label: 'LinkedIn', sub: 'ibrahim-cissé', href: 'https://www.linkedin.com/in/ibrahim-ciss%C3%A9-6981b8240/', icon: 'linkedin' },
+      { label: 'Réserver un call', sub: 'Notion Calendar', href: 'https://calendar.notion.so/meet/ibrahimcisse1/044on4pg6', icon: 'calendar' },
+      { label: 'GitHub', sub: 'ibrahim-00223', href: 'https://github.com/ibrahim-00223', icon: 'github' },
+      { label: 'YouTube', sub: '@by_ibrah07', href: 'https://youtube.com/@by_ibrah07', icon: 'youtube' },
+    ],
+  },
 }
 
 function loadData() {

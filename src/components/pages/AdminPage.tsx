@@ -12,6 +12,8 @@ import { getScorecard, saveScorecard, resetScorecard, isUsingCustomScorecard, mo
 import type { StatModule } from '../../data/scorecardStore'
 import { getAcademic, saveAcademic, resetAcademic, isUsingCustomAcademic } from '../../data/academicStore'
 import type { AcademicEntry } from '../../data/academicStore'
+import { getContact, saveContactData, resetContact } from '../../data/contactStore'
+import type { ContactLink, ContactData } from '../../data/contactStore'
 
 import type { Project } from '../../data/projects'
 import type { TimelinePhase } from '../../data/timeline'
@@ -22,7 +24,7 @@ import { groupLabels } from '../../data/stack'
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'Ibrahim2025'
 const SESSION_KEY    = 'portfolio_admin_auth'
 
-type Tab = 'projets' | 'experiences' | 'stack' | 'statut' | 'scorecard' | 'academique'
+type Tab = 'projets' | 'experiences' | 'stack' | 'statut' | 'scorecard' | 'academique' | 'contact'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // PROJETS
@@ -82,6 +84,11 @@ const formToProject = (f: ProjectFormData, index: number): Project => {
 // ═══════════════════════════════════════════════════════════════════════════════
 const COLOR_OPTIONS: TimelinePhase['color'][] = ['amber', 'cyan', 'green']
 const COLOR_LABELS = { amber: 'Ambre (#ffb000)', cyan: 'Cyan (#00d4ff)', green: 'Rose (brand pink)' }
+
+const iconLabels: Record<string, string> = {
+  linkedin: '🔗 LinkedIn', github: '🐙 GitHub', youtube: '▶ YouTube',
+  calendar: '📅 Calendar', twitter: '𝕏 Twitter', email: '✉ Email', link: '🔗 Lien',
+}
 
 type ExpFormData = Omit<TimelinePhase, 'tags'> & { tagsStr: string }
 
@@ -183,6 +190,16 @@ export function AdminPage() {
   const [customAcad, setCustomAcad]     = useState(() => isUsingCustomAcademic())
   const [editingAcad, setEditingAcad]   = useState<string | null>(null)
   const [acadForm, setAcadForm]         = useState<AcadFormData>(emptyAcadForm())
+
+  // ── CONTACT state ───────────────────────────────────────────────────────────
+  const [contactData, setContactData]   = useState<ContactData>(() => getContact())
+  const [customContact, setCustomContact] = useState(() => localStorage.getItem('portfolio_contact') !== null)
+  const [editingLink, setEditingLink]   = useState<number | null>(null)
+  const [linkForm, setLinkForm]         = useState<ContactLink & { name: string; role: string }>(() => ({
+    name: getContact().name,
+    role: getContact().role,
+    label: '', sub: '', href: '', icon: 'link',
+  }))
 
   // ── Auth ───────────────────────────────────────────────────────────────────
   const handleLogin = () => {
@@ -316,6 +333,39 @@ export function AdminPage() {
   }
 
   // ════════════════════════════════════════════════════════════════════════════
+  // CONTACT handlers
+  // ════════════════════════════════════════════════════════════════════════════
+  const persistContactFn = (updated: ContactData) => {
+    saveContactData(updated); setContactData(getContact()); setCustomContact(true); flash()
+  }
+  const handleContactSave = () => {
+    const data: ContactData = {
+      name: linkForm.name.trim() || 'Ibrahim CISSE',
+      role: linkForm.role.trim() || 'GTM Engineer · AI Builder · Content Creator',
+      links: editingLink === null || editingLink < 0
+        ? [...contactData.links, { label: linkForm.label.trim(), sub: linkForm.sub.trim(), href: linkForm.href.trim(), icon: linkForm.icon }]
+        : contactData.links.map((l, i) => i === editingLink
+          ? { label: linkForm.label.trim(), sub: linkForm.sub.trim(), href: linkForm.href.trim(), icon: linkForm.icon }
+          : l),
+    }
+    persistContactFn(data); setEditingLink(null)
+  }
+  const handleContactDeleteLink = (idx: number) => {
+    if (!confirm(`Supprimer "${contactData.links[idx]?.label}" ?`)) return
+    persistContactFn({ ...contactData, links: contactData.links.filter((_, i) => i !== idx) })
+  }
+  const handleContactReorderLink = (idx: number, dir: -1 | 1) => {
+    const next = idx + dir
+    if (next < 0 || next >= contactData.links.length) return
+    const links = [...contactData.links]
+    ;[links[idx], links[next]] = [links[next], links[idx]]
+    persistContactFn({ ...contactData, links })
+  }
+  const handleContactNameRoleSave = () => {
+    persistContactFn({ ...contactData, name: contactData.name.trim() || 'Ibrahim CISSE', role: contactData.role.trim() || 'GTM Engineer · AI Builder · Content Creator' })
+  }
+
+  // ════════════════════════════════════════════════════════════════════════════
   // ÉCRAN DE CONNEXION
   // ════════════════════════════════════════════════════════════════════════════
   if (!authed) {
@@ -401,6 +451,7 @@ export function AdminPage() {
             { key: 'statut',      label: 'Statut',       count: null            },
             { key: 'scorecard',   label: 'Score Card',   count: scModules.length },
             { key: 'academique',  label: 'Académique',   count: acadEntries.length },
+            { key: 'contact',     label: 'Contact',      count: contactData.links.length },
           ] as { key: Tab; label: string; count: number | null }[]).map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
               className={clsx(
@@ -1008,6 +1059,106 @@ export function AdminPage() {
                 )
               })}
               {acadEntries.length === 0 && <EmptyState label="entrée académique" onAdd={() => { setAcadForm(emptyAcadForm()); setEditingAcad('new') }} />}
+            </div>
+          </div>
+        )}
+
+        {/* ═══ ONGLET CONTACT ════════════════════════════════════════════════ */}
+        {tab === 'contact' && (
+          <div className="space-y-6">
+            <StatusBanner custom={customContact} count={contactData.links.length} label="lien"
+              onReset={() => { resetContact(); setContactData(getContact()); setCustomContact(false); flash('Réinitialisé ✓') }} />
+
+            {/* Nom et rôle */}
+            <div className="card p-6 space-y-4">
+              <h2 className="font-semibold text-white text-sm">Profil de la modale</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Field label="Nom">
+                  <input
+                    value={contactData.name}
+                    onChange={e => setContactData(d => ({ ...d, name: e.target.value }))}
+                    className="admin-input"
+                    placeholder="Ibrahim CISSE"
+                  />
+                </Field>
+                <Field label="Rôle">
+                  <input
+                    value={contactData.role}
+                    onChange={e => setContactData(d => ({ ...d, role: e.target.value }))}
+                    className="admin-input"
+                    placeholder="GTM Engineer · AI Builder · Content Creator"
+                  />
+                </Field>
+              </div>
+              <button onClick={handleContactNameRoleSave} className="btn-primary text-sm">
+                Sauvegarder le profil
+              </button>
+            </div>
+
+            {/* Links */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="font-semibold text-white text-sm">Liens</h2>
+                <button onClick={() => { setLinkForm({ name: contactData.name, role: contactData.role, label: '', sub: '', href: '', icon: 'link' }); setEditingLink(-1) }} className="btn-primary text-sm">
+                  + Nouveau lien
+                </button>
+              </div>
+
+              <AnimatePresence>
+                {editingLink !== null && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+                    <div className="card border-brand-pink/20 p-6 space-y-5">
+                      <div className="flex items-center justify-between">
+                        <h2 className="font-semibold text-white">
+                          {editingLink === -1 ? 'Nouveau lien' : `Modifier — ${linkForm.label || '…'}`}
+                        </h2>
+                        <CloseBtn onClick={() => setEditingLink(null)} />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Field label="Label *"><input value={linkForm.label} onChange={e => setLinkForm(f => ({ ...f, label: e.target.value }))} className="admin-input" placeholder="LinkedIn" /></Field>
+                        <Field label="Sous-titre"><input value={linkForm.sub} onChange={e => setLinkForm(f => ({ ...f, sub: e.target.value }))} className="admin-input" placeholder="ibrahim-cissé" /></Field>
+                        <Field label="Icône">
+                          <select value={linkForm.icon} onChange={e => setLinkForm(f => ({ ...f, icon: e.target.value }))} className="admin-input">
+                            <option value="linkedin">LinkedIn</option>
+                            <option value="github">GitHub</option>
+                            <option value="youtube">YouTube</option>
+                            <option value="calendar">Calendar</option>
+                            <option value="twitter">Twitter / X</option>
+                            <option value="email">Email</option>
+                            <option value="link">Lien générique</option>
+                          </select>
+                        </Field>
+                        <Field label="URL *"><input value={linkForm.href} onChange={e => setLinkForm(f => ({ ...f, href: e.target.value }))} className="admin-input" placeholder="https://..." /></Field>
+                      </div>
+                      <FormActions onSave={handleContactSave} onCancel={() => setEditingLink(null)}
+                        disabled={!linkForm.label.trim() || !linkForm.href.trim()} />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <div className="space-y-2">
+                {contactData.links.map((link, i) => (
+                  <motion.div key={i} layout className="card px-5 py-4 flex items-center gap-4">
+                    <ReorderBtns
+                      onUp={() => handleContactReorderLink(i, -1)}
+                      onDown={() => handleContactReorderLink(i, 1)}
+                      disabledUp={i === 0} disabledDown={i === contactData.links.length - 1}
+                    />
+                    <span className="text-text-tertiary font-mono text-xs w-8 shrink-0">{iconLabels[link.icon] ?? link.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-white text-sm">{link.label}</div>
+                      <div className="text-text-tertiary text-xs truncate mt-0.5">{link.sub}</div>
+                    </div>
+                    <RowActions
+                      onEdit={() => { setLinkForm({ name: contactData.name, role: contactData.role, ...link }); setEditingLink(i) }}
+                      onDelete={() => handleContactDeleteLink(i)}
+                    />
+                  </motion.div>
+                ))}
+                {contactData.links.length === 0 && <EmptyState label="lien" onAdd={() => { setLinkForm({ name: contactData.name, role: contactData.role, label: '', sub: '', href: '', icon: 'link' }); setEditingLink(-1) }} />}
+              </div>
             </div>
           </div>
         )}
